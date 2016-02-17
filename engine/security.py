@@ -15,7 +15,7 @@ class databaseInteractions:
         self.cursor.execute("SELECT * FROM user_lfg_status WHERE username=?",(player_name,))
         uls_res = self.cursor.fetchone()
 
-        if uls_res[1] == 0: # User not in lfg
+        if uls_res is None: # User not in lfg
             print "PATH 1"
             self.cursor.execute("SELECT * FROM lfg WHERE num<>6 ORDER BY num DESC")
             res = self.cursor.fetchone()
@@ -24,6 +24,8 @@ class databaseInteractions:
                 print "PATH 1B"
                 self.cursor.execute("INSERT INTO lfg (players,num) VALUES (?,?)", (str([]), 0))
                 self.connection.commit()
+                self.cursor.execute("SELECT * FROM lfg WHERE num<>6 ORDER BY num DESC")
+                res = self.cursor.fetchone()
 
             print "PATH 1A"
             players_d = ast.literal_eval(res[1])

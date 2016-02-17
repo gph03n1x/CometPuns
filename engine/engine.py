@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 import Queue
 import threading
-from nations import NationsToList
+
+
 
 class Engine(object):
     def __init__(self, dbi):

@@ -20,5 +20,5 @@ class LobbyHandler(BaseHandler):
         self.render("lobby.html", info=self.info)
 
     def post(self):
-        DBI.update_match_making(self.get_current_user())
+        self.DBI.update_match_making(self.get_current_user())
         self.render("lobby.html", info=self.info)

@@ -4,7 +4,6 @@ import logging
 from handlers.base_handler import BaseHandler
 import handlers.localization as localization
 
-from engine.nations import NationsToList
 
 class BoardHandler(BaseHandler):
     @tornado.web.authenticated
