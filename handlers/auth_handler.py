@@ -31,7 +31,7 @@ class AuthHandler(BaseHandler):
                 self.set_cookie('info', 'SMSG3')
             else:
                 self.set_cookie('info', 'SMSG4')
-            self.redirect("/")
+            self.redirect("/auth")
 
         if len(self.get_arguments('email')) >0 and len(self.get_arguments('password')) > 0:
             username = self.DBI.authenticate(self.get_arguments('email')[0], self.get_arguments('password')[0])

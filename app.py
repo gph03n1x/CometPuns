@@ -10,13 +10,15 @@ else:
     import tests
     sys.exit(0)
     
+    
+import json
+import uuid
+import logging
 import os.path
 import tornado.web
 import tornado.ioloop
 import tornado.websocket
-import json
-import logging
-import uuid
+import ConfigParser
 
 import handlers.localization as localization
 
@@ -30,16 +32,23 @@ from handlers.chat_socket_handler import ChatSocketHandler
 from engine.security import databaseInteractions
 from engine.engine import Engine
 
+config = ConfigParser.RawConfigParser()
+config.read('cometpuns.cfg')
+
+
 print "[*] Connecting with the database ..."
-DBI = databaseInteractions("database/crisk.db")
+DBI = databaseInteractions(config.get('GENERAL', 'DATABASE_FILE'))
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS puns (id INTEGER PRIMARY KEY, message)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_lfg_status (username, lfg_id)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS match_status (id INTEGER PRIMARY KEY, turn, teams, details, completed)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS lfg (id INTEGER PRIMARY KEY, players, num, match_key)")
-print "[*] Conection successfull !!!"
+print "[*] Conection successfull with database: " + config.get('GENERAL', 'DATABASE_FILE')
 
 Engine(DBI)
+
+
+
 
 settings = {
     "cookie_secret": "sVvW58QWgjAld7DK2FnOUzZLmoQgvlqDIh6mPYC8HDWanE5GqYy6v3Uu2ivKG36O",
@@ -62,5 +71,6 @@ application = tornado.web.Application(
 )
 
 if __name__ == "__main__":
-    application.listen(8888)
+    application.listen(config.getint('GENERAL', 'PORT'))
+    print "[*] Listening at port: " + config.get('GENERAL', 'PORT')
     tornado.ioloop.IOLoop.current().start()

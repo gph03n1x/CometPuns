@@ -55,7 +55,7 @@ class databaseInteractions:
         if str(self.cursor.fetchone()) == "None":
             self.cursor.execute("INSERT INTO users (username, email, password) VALUES (?,?,?)", (username, email, password))
             self.connection.commit()
-            self.cursor.execute("INSERT INTO user_lfg_status (username, lfg_id) VALUES (?,0)", (username,))
+            self.cursor.execute("INSERT INTO user_lfg_status (username, lfg_id) VALUES (?,-1)", (username,))
             self.connection.commit()
             return True
         else:
