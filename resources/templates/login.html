@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+
+    <title>Signin </title>
+    <link rel="stylesheet" href='{{ static_url("semantic/dist/semantic.min.css") }}' type="text/css"/>
+    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="{{ static_url('semantic/dist/semantic.min.js') }}"></script>
+
+  </head>
+
+  <body>
+      <div class="main ui container">
+          <div class="ui top attached tabular menu">
+              <a class="active item" data-tab="login">Login</a>
+              <a class="item" data-tab="register">Register</a>
+          </div>
+          <div class="ui bottom attached tab segment active" data-tab="login">
+              <form class="form-signin" action="/auth" method="post" name="login">
+                  <div class="ui form">
+                      <div class="field">
+                          <label>Email address</label>
+                          <div class="ui left icon input">
+                              <input placeholder="Email address" type="text" id="email" name="email">
+                              <i class="mail icon"></i>
+                          </div>
+                      </div>
+                      <div class="field">
+                          <label>Password</label>
+                          <div class="ui left icon input">
+                              <input type="password" id="password" name="password" placeholder="Password">
+                              <i class="lock icon"></i>
+                          </div>
+                      </div>
+                      <button class="ui blue submit button" type="submit">Sign in</button>
+                  </div>
+              </form>
+          </div>
+          <div class="ui bottom attached tab segment" data-tab="register">
+              <form class="form-signin" action="/auth" method="post" name="register">
+                  <div class="ui form">
+                      <div class="field">
+                          <label>Username</label>
+                          <div class="ui left icon input">
+                              <input placeholder="Username" type="text" id="usernameR" name="usernameR">
+                              <i class="user icon"></i>
+                          </div>
+                      </div>
+                      <div class="field">
+                          <label>Email address</label>
+                          <div class="ui left icon input">
+                              <input placeholder="Email address" type="text" id="emailR" name="emailR">
+                              <i class="mail icon"></i>
+                          </div>
+                      </div>
+                      <div class="field">
+                          <label>Password</label>
+                          <div class="ui left icon input">
+                              <input type="password" id="passwordR" name="passwordR" placeholder="Password">
+                              <i class="lock icon"></i>
+                          </div>
+                      </div>
+                      <button class="ui blue submit button" type="submit">Sign Up</button>
+                  </div>
+              </form>
+          </div>
+          {% if len(info) > 0 %}
+            <div class="ui message">{{ escape(info) }}</div>
+          {% end %}
+      </div>
+      <script>$('.menu .item').tab();</script>
+  </body>
+</html>
