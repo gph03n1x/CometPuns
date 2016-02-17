@@ -16,9 +16,20 @@ class LobbyHandler(BaseHandler):
         if self.get_cookie('info') in localization.MSG:
             self.info = localization.MSG[self.get_cookie('info')]
         self.set_cookie('info', '')
+        
+    @tornado.web.authenticated
     def get(self):
-        self.render("lobby.html", info=self.info)
-
+        self.DBI.cursor.execute("SELECT * FROM user_lfg_status WHERE username=?",(self.get_current_user(),))
+        uls_res = str(self.DBI.cursor.fetchone()) + "\n"
+        self.DBI.cursor.execute("SELECT * FROM lfg")
+        uls_res += str(self.DBI.cursor.fetchone())
+        self.render("lobby.html", info=self.info, lfg=uls_res)
+    
+    @tornado.web.authenticated
     def post(self):
         self.DBI.update_match_making(self.get_current_user())
-        self.render("lobby.html", info=self.info)
+        self.DBI.cursor.execute("SELECT * FROM user_lfg_status WHERE username=?",(self.get_current_user(),))
+        uls_res = str(self.DBI.cursor.fetchone()) + "\n"
+        self.DBI.cursor.execute("SELECT * FROM lfg")
+        uls_res += str(self.DBI.cursor.fetchone())
+        self.render("lobby.html", info=self.info, lfg=uls_res)

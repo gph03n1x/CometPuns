@@ -9,9 +9,7 @@ except IndexError:
 else:
     import tests
     sys.exit(0)
-
-
-
+    
 import os.path
 import tornado.web
 import tornado.ioloop
