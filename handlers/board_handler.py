@@ -8,9 +8,6 @@ import handlers.localization as localization
 class BoardHandler(BaseHandler):
     @tornado.web.authenticated
 
-    def initialize(self, database):
-        self.DBI = database
-
     def get(self):
         pass
 

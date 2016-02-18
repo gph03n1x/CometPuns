@@ -8,9 +8,6 @@ import handlers.localization as localization
 class LobbyHandler(BaseHandler):
     @tornado.web.authenticated
 
-    def initialize(self, database):
-        self.DBI = database
-
     def prepare(self):
         self.info = ''
         if self.get_cookie('info') in localization.MSG:

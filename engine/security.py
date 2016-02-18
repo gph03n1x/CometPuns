@@ -50,6 +50,14 @@ class databaseInteractions:
         #print "Auth call for \'{0}\'".format(email)
         self.cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (email,password))
         return self.cursor.fetchone()
+    
+    def get_user_uuid(self, username):
+        self.cursor.execute("SELECT uuid FROM users WHERE username=?", (username,))
+        return self.cursor.fetchone()
+    
+    def update_uuid(self, username, _uuid):
+        self.cursor.execute("UPDATE users SET uuid=? WHERE username=?",(str(_uuid),username))
+        self.connection.commit()
 
     def register(self, username, email, password):
         self.cursor.execute("SELECT * FROM users WHERE email=?", (email,))

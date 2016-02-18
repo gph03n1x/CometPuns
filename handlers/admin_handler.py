@@ -9,8 +9,5 @@ import handlers.localization as localization
 class AdminHandler(BaseHandler):
     @tornado.web.authenticated
 
-    def initialize(self, database):
-        self.DBI = database
-
     def get(self):
         pass
