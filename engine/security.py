@@ -6,6 +6,7 @@ import ast
 import inspect
 
 class databaseInteractions:
+    
     def __init__(self, dbfile):
         self.connection = sqlite3.connect(dbfile)
         self.cursor = self.connection.cursor()
