@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import unittest, sqlite3
-from engine.security import databaseInteractions
+from engine.database import databaseInteractions
 
 class TestdatabaseInteractions(unittest.TestCase):
 

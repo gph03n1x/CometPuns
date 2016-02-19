@@ -36,7 +36,7 @@ from handlers.chat_socket_handler import ChatSocketHandler
 
 # to engine security einai misleading 
 # kai tha eprepe na einai database stuff mono
-from engine.security import databaseInteractions
+from engine.database import databaseInteractions
 # to engine pou tha trexei sto background
 from engine.engine import Engine
 
@@ -54,9 +54,11 @@ DBI = databaseInteractions(config.get('GENERAL', 'DATABASE_FILE'))
 
 DBP.execute_raw("CREATE TABLE IF NOT EXISTS puns (id INTEGER PRIMARY KEY, content, category)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password, uuid)")
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_lfg_status (username, lfg_id)")
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS match_status (id INTEGER PRIMARY KEY, turn, teams, details, completed)")
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS lfg (id INTEGER PRIMARY KEY, players, num, match_key)")
+
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id)")
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS chat_room (room_id, users)")
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS game_room (room_id INTEGER PRIMARY KEY, users, open BOOLEAN, details)")
+
 print "[*] Conection successfull with database: " + config.get('GENERAL', 'DATABASE_FILE')
 
 # ekinisi toy engine pou tha trexei sto background
