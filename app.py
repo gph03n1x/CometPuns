@@ -57,7 +57,7 @@ DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, usern
 
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS chat_room (room_id, users)")
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS game_room (room_id INTEGER PRIMARY KEY, users, open BOOLEAN, details)")
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS game_room (id INTEGER PRIMARY KEY, users, open, details)")
 
 print "[*] Conection successfull with database: " + config.get('GENERAL', 'DATABASE_FILE')
 

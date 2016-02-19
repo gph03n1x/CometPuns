@@ -22,11 +22,7 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
     def on_close(self):
         del ChatSocketHandler.waiters[self]
         # Remove player from lfg
-        self.DBI.cursor.execute("SELECT * FROM user_lfg_status WHERE username=?",(self.get_secure_cookie("user"),))
-        uls_res = self.DBI.cursor.fetchone()
-
-        if uls_res[1] != -1:
-            self.DBI.update_match_making(self.get_secure_cookie("user"))
+        self.DBI.user_left_room(self.get_secure_cookie("user"))
 
 
     @classmethod

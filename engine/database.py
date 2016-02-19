@@ -15,9 +15,22 @@ class databaseInteractions:
         self.connection = sqlite3.connect(dbfile)
         self.cursor = self.connection.cursor()
         self.max_users_per_room = config.get('GENERAL', 'MAX_ROOM_USERS')
+        
+        
+    def user_left_room(self, player_name):
+        self.cursor.execute("SELECT * FROM user_room WHERE username=?",(player_name,))
+        user_room = self.cursor.fetchone()
+        
+        if user_room[1] != -1:
+            self.cursor.execute("SELECT * FROM game_room WHERE id=?",
+                            (user_room[1],))
+            room = self.cursor.fetchone()
+            self.execute_raw("UPDATE game_room SET users=? WHERE id=?", (room[1]-1, room[0]))
+            self.execute_raw("UPDATE user_room SET room_id=-1 WHERE username=?",(player_name, ))
+
 
     def quick_join_room(self, player_name):
-        self.cursor.execute("SELECT * FROM game_room WHERE users<=? AND open=TRUE ORDER BY users DESC",
+        self.cursor.execute("SELECT * FROM game_room WHERE (users<=? and open='TRUE') ORDER BY users DESC",
                             (self.max_users_per_room,))
         room = self.cursor.fetchone()
         if room:
@@ -26,7 +39,7 @@ class databaseInteractions:
             self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(room[0], player_name))
         else:
             room_id = self.execute_raw(
-                "INSERT INTO game_room (users, open, details) VALUES (1, TRUE, ?)", (str({}), )
+                "INSERT INTO game_room (users, open, details) VALUES (1, 'TRUE', ?)", (str({}), )
                                        )
             self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(str(room_id), player_name))
             
