@@ -14,7 +14,7 @@ class databaseInteractions:
     def __init__(self, dbfile):
         self.connection = sqlite3.connect(dbfile)
         self.cursor = self.connection.cursor()
-        self.max_users_per_room = config.get('GENERAL', 'MAX_ROOM_USERS')
+        self.max_users_per_room = config.get('GENERAL', 'MAX_USERS_PER_ROOM')
         
         
     def user_left_room(self, player_name):

@@ -23,6 +23,7 @@ import tornado.ioloop
 import tornado.websocket
 import ConfigParser
 
+logging.basicConfig(filename='error.log', level=logging.DEBUG)
 
 import handlers.localization as localization # afora cookie messages
 
@@ -33,6 +34,7 @@ from handlers.admin_handler import AdminHandler
 from handlers.lobby_handler import LobbyHandler
 from handlers.board_handler import BoardHandler
 from handlers.chat_socket_handler import ChatSocketHandler
+from handlers.engine_socket_handler import EngineSocketHandler
 
 # to engine security einai misleading 
 # kai tha eprepe na einai database stuff mono
@@ -43,6 +45,7 @@ from engine.engine import Engine
 # anoigma tou arxeiou pou xrisimopoieitai os config
 config = ConfigParser.RawConfigParser() 
 config.read('cometpuns.cfg') 
+
 
 
 print "[*] Connecting with the database ..."
@@ -83,6 +86,7 @@ application = tornado.web.Application(
         (r"/board", BoardHandler, dict(database=DBI)),
         (r"/admin", AdminHandler, dict(database=DBI)),
         (r"/chatsocket", ChatSocketHandler, dict(database=DBI)),
+        (r"/engine", EngineSocketHandler, dict(database=DBI)),
 
     ],
     debug=True,
