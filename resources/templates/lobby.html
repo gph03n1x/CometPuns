@@ -25,7 +25,7 @@
                 <div class="one wide column"></div>
                 <div class="three wide column">
                     <div class="ui info message">
-                        <div class="header">
+                        <div class="header" id="roomId">
                             Room Id : #{{ escape(room_id) }}
                         </div>
                     </div>
@@ -43,14 +43,31 @@
                             </tr>
                         </tbody>
                     </table>
-                
-                
-                
                 </div>
                 <div class="eight wide column">
                     {% if len(info) > 0 %}
-                    <div class="alert alert-info">{{ escape(info) }}</div>
+                    <div class="ui warning message">{{ escape(info) }}</div>
                     {% end %}
+                    
+                    <div class="ui olive message">
+                        <div class="header">
+                            Opener : #{{ escape(room_id) }}
+                        </div>
+                    </div>
+                    
+                    <div class="ui violet message">
+                        <div class="header">
+                            <button class="ui button">Choose</button>
+                            Option : #{{ escape(room_id) }}
+                            
+                        </div>
+                        
+                    </div>
+                    
+
+
+
+                    
                 </div>
                 <div class="three wide column">
                     <h3 class="ui top attached blue header">Chat</h3>

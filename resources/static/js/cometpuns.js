@@ -21,6 +21,12 @@ var updater = {
     },
 
     showMessage: function(message) {
+        if (message.body[0] == "/") {
+            var command = message.body.split(" ");
+            if (command[0] == "/channel") {
+                $("#roomId").text( "Room Id : #"+command[1]);
+            }
+        }
         var existing = $("#m" + message.id);
         if (existing.length > 0) return;
         var node = $(message.html);

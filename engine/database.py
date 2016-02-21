@@ -27,12 +27,14 @@ class databaseInteractions:
         user_room = self.get_user_room(player_name)
         
         if user_room != -1:
-            self.cursor.execute("SELECT * FROM game_room WHERE id=?",
-                            (user_room,))
+            self.cursor.execute(
+                "SELECT * FROM game_room WHERE id=?", (user_room,)
+                            )
             room = self.cursor.fetchone()
-            self.execute_raw("UPDATE game_room SET users=? WHERE id=?", (room[1]-1, room[0]))
+            self.execute_raw("UPDATE game_room SET users=? WHERE id=?", (int(room[1]-1), room[0]))
             self.execute_raw("UPDATE user_room SET room_id=-1 WHERE username=?",(player_name, ))
-
+            if int(room[1]-1) == 0:
+                self.execute_raw("DELETE FROM game_room WHERE users=0")
 
     def quick_join_room(self, player_name):
         self.cursor.execute("SELECT * FROM game_room WHERE (users<=? and open='TRUE') ORDER BY users DESC",
@@ -43,12 +45,18 @@ class databaseInteractions:
             self.execute_raw("UPDATE game_room SET users=? WHERE id=?", (room[1]+1, room[0]))
             self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(room[0], player_name))
         else:
-            room_id = self.execute_raw(
-                "INSERT INTO game_room (users, open, details) VALUES (1, 'TRUE', ?)", (str({}), )
-                                       )
-            self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(str(room_id), player_name))
-            
-            
+            create_room_and_join(player_name)
+        
+    def create_room_and_join(self, player_name):
+        room_id = self.execute_raw(
+            "INSERT INTO game_room (users, open, details) VALUES (1, 'TRUE', ?)", (str({}), )
+                                )
+        self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(str(room_id), player_name))
+        return room_id
+    
+    def list_room_users(room_id):
+        pass
+    
     def join_player_room(self, player_name, target_player):
         pass
         
@@ -56,10 +64,6 @@ class databaseInteractions:
     def invite_player_room(self, player_name, target_player):
         pass
         
-        
-    def list_open_rooms(self):
-        pass
-
 
     def authenticate(self, email, password):
         #print "Auth call for \'{0}\'".format(email)
