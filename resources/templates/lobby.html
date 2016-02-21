@@ -6,9 +6,9 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <title>CometPuns Lobby</title>
 
-        <link rel="stylesheet" href="{{ static_url('dist/semantic.min.css') }}" type="text/css"/>
+        <link rel="stylesheet" href="{{ static_url('semantic/semantic.min.css') }}" type="text/css"/>
         <script src="{{ static_url('js/jquery-1.12.0.min.js') }}"></script>
-        <script src="{{ static_url('dist/semantic.min.js') }}"></script>
+        <script src="{{ static_url('semantic/semantic.min.js') }}"></script>
     </head>
     <body>
         
@@ -29,10 +29,10 @@
                 </div>
                 <div class="four wide column">
                     <h3>Comments</h3>
-                    <div class="ui segment" id="chat">
-
-                        
+                    <h3 class="ui top attached header">Top Attached</h3>
+                    <div class="ui attached segment" id="chat" style="max-height: 250px; overflow-y: auto;">
                     </div>
+
                     <div class="ui input">
                         <input id="chat-input" name="message" type="text">
                     </div>

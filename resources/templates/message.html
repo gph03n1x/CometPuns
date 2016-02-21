@@ -1,5 +1,5 @@
-<div class="ui raised segment" id="m{{ message['id'] }}">
-    <a class="ui red ribbon label">{% module linkify(message["user"]) %}</a>
+<div id="m{{ message['id'] }}">
+    <a class="ui cyan label">{% module linkify(message["user"]) %}</a>
     <span>{% module linkify(message["time"]) %}</span>
     <p>{% module linkify(message["body"]) %}</p>
 </div>

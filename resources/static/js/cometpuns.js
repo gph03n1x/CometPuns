@@ -27,6 +27,9 @@ var updater = {
         node.hide();
         $("#chat").append(node);
         node.slideDown();
+        $('#chat').stop().animate({
+            scrollTop: $("#chat")[0].scrollHeight
+        }, 800);
     }
 };
 

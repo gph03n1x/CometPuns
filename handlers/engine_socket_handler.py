@@ -41,7 +41,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 "id": str(uuid.uuid4()),
                 "user": "System",
                 "body": parsed,
-                "time": datetime.datetime.now()
+                "time": str(datetime.datetime.now().replace(microsecond=0))
             }
             chat["html"] = tornado.escape.to_basestring(
                 self.render_string("message.html", message=chat))
@@ -55,7 +55,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 "id": str(uuid.uuid4()),
                 "user": EngineSocketHandler.waiters[self],
                 "body": parsed,
-                "time": str(datetime.datetime.now())
+                "time": str(datetime.datetime.now().replace(microsecond=0))
                 }
  
             chat["html"] = tornado.escape.to_basestring(
