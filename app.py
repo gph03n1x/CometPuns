@@ -33,7 +33,6 @@ from handlers.auth_handler import AuthHandler
 from handlers.admin_handler import AdminHandler
 from handlers.lobby_handler import LobbyHandler
 from handlers.board_handler import BoardHandler
-from handlers.chat_socket_handler import ChatSocketHandler
 from handlers.engine_socket_handler import EngineSocketHandler
 
 # to engine security einai misleading 
@@ -62,8 +61,8 @@ DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS chat_room (room_id, users)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS game_room (id INTEGER PRIMARY KEY, users, open, details)")
 
-print "[*] Conection successfull with database: " + config.get('GENERAL', 'DATABASE_FILE')
-
+print "[+] Conection successfull with database: " + config.get('GENERAL', 'DATABASE_FILE')
+print "[+] Conection successfull with puns: " + config.get('GENERAL', 'DATABASE_FILE')
 # ekinisi toy engine pou tha trexei sto background
 # otan ilopoiithei
 Engine(DBI)
@@ -75,6 +74,7 @@ Engine(DBI)
 settings = {
     "cookie_secret": "sVvW58QWgjAld7DK2FnOUzZLmoQgvlqDIh6mPYC8HDWanE5GqYy6v3Uu2ivKG36O",
     "login_url": "/auth",
+    #"xsrf_cookies": True,
 }
 
 # sindeei sto app ta urls me tous handlers tous
@@ -85,7 +85,6 @@ application = tornado.web.Application(
         (r"/auth", AuthHandler, dict(database=DBI)),
         (r"/board", BoardHandler, dict(database=DBI)),
         (r"/admin", AdminHandler, dict(database=DBI)),
-        (r"/chatsocket", ChatSocketHandler, dict(database=DBI)),
         (r"/engine", EngineSocketHandler, dict(database=DBI)),
 
     ],

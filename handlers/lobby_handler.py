@@ -16,9 +16,11 @@ class LobbyHandler(BaseHandler):
         
     @tornado.web.authenticated
     def get(self):
-        self.render("lobby.html", info=self.info, lfg='[]')
+        roomid = str(self.DBI.get_user_room(self.get_current_user()))
+        self.render("lobby.html", info=self.info, room_id=roomid, user=self.get_current_user())
     
     @tornado.web.authenticated
     def post(self):
         self.DBI.quick_join_room(self.get_current_user())
-        self.render("lobby.html", info=self.info, lfg='[]')
+        roomid = str(self.DBI.get_user_room(self.get_current_user()))
+        self.render("lobby.html", info=self.info, room_id=roomid, user=self.get_current_user())

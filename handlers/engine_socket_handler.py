@@ -34,7 +34,6 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 logging.error("Error sending message", exc_info=True)
 
     def on_message(self, message):
-        logging.info("got message %r", message)
         if message[0] == "/":
             # process request
             chat = {

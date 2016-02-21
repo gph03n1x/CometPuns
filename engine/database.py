@@ -16,14 +16,19 @@ class databaseInteractions:
         self.cursor = self.connection.cursor()
         self.max_users_per_room = config.get('GENERAL', 'MAX_USERS_PER_ROOM')
         
-        
-    def user_left_room(self, player_name):
+    def get_user_room(self, player_name):
         self.cursor.execute("SELECT * FROM user_room WHERE username=?",(player_name,))
         user_room = self.cursor.fetchone()
+        if user_room:
+            return user_room[1]
+        return None
         
-        if user_room[1] != -1:
+    def user_left_room(self, player_name):
+        user_room = self.get_user_room(player_name)
+        
+        if user_room != -1:
             self.cursor.execute("SELECT * FROM game_room WHERE id=?",
-                            (user_room[1],))
+                            (user_room,))
             room = self.cursor.fetchone()
             self.execute_raw("UPDATE game_room SET users=? WHERE id=?", (room[1]-1, room[0]))
             self.execute_raw("UPDATE user_room SET room_id=-1 WHERE username=?",(player_name, ))
