@@ -28,7 +28,7 @@ class databaseInteractions:
         user_room = self.get_user_room(player_name)
         
         if not user_room:
-            return
+            return -1
         
         if int(user_room) != -1:
             self.cursor.execute(
@@ -40,6 +40,7 @@ class databaseInteractions:
             self.execute_raw("UPDATE user_room SET room_id=-1 WHERE username=?",(player_name, ))
             if int(room[1]-1) == 0:
                 self.execute_raw("DELETE FROM game_room WHERE users=0")
+            return room[0]
 
     def quick_join_room(self, player_name):
         self.user_left_room(player_name)

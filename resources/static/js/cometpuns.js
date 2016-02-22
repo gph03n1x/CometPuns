@@ -21,7 +21,7 @@ var updater = {
     },
 
     showMessage: function(message) {
-        if (message.body[0] == "/") {
+        if (message.body[0] == "/" && message.user == "System") {
             var command = message.body.split(" ");
             var arrayLength = command.length;
             console.log(command);

@@ -65,10 +65,10 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         parsed = tornado.escape.json_decode(message)
-        logging.debug("message " + parsed)
+        
         if parsed[0] == "/":
             # process request
-            logging.debug("process " + parsed[1:7])
+            logging.debug("Command: " + parsed)
             chat = {
                 "id": str(uuid.uuid4()),
                 "user": "System",
@@ -76,6 +76,11 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 "time": str(datetime.datetime.now().replace(microsecond=0))
             }
             parsed = parsed.split()
+            if parsed[0] == "/leave":
+                room_id = self.DBI.user_left_room(self.get_secure_cookie("user"))
+                if room_id > 0:
+                    self.inform_room_users(room_id, chat)
+                    chat["body"] = "/channel -1"
             
             if parsed[0] == "/create":
                 room_id = self.DBI.create_room_and_join(EngineSocketHandler.waiters[self])

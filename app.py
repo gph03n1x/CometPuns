@@ -33,6 +33,7 @@ from handlers.auth_handler import AuthHandler
 from handlers.admin_handler import AdminHandler
 from handlers.lobby_handler import LobbyHandler
 from handlers.board_handler import BoardHandler
+from handlers.profile_handler import ProfileHandler
 from handlers.engine_socket_handler import EngineSocketHandler
 
 # to engine security einai misleading 
