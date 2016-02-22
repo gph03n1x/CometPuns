@@ -8,6 +8,7 @@ import datetime
 class EngineSocketHandler(tornado.websocket.WebSocketHandler):
     
     waiters = {}
+    users = {}
 
     def initialize(self, database):
         self.DBI = database
@@ -18,11 +19,39 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
 
     def open(self):
         EngineSocketHandler.waiters[self] = self.get_secure_cookie("user")
+        EngineSocketHandler.users[self.get_secure_cookie("user")] = self
+        
+
+    def inform_room_users(self, room_id, chat):
+        users = self.DBI.list_room_users(room_id)
+        if users:
+            chat["body"] = "/users " + " ".join((str(i[0])+":"+str(i[2])) for i in users)
+            logging.debug(chat["body"])
+            chat["html"] = tornado.escape.to_basestring(
+                self.render_string("message.html", message=chat))
+            for i in users:
+                EngineSocketHandler.users[i[0]].write_message(chat)
+            
 
     def on_close(self):
         del EngineSocketHandler.waiters[self]
-        # Remove player from lfg
+        del EngineSocketHandler.users[self.get_secure_cookie("user")]
+        # Remove player from his room
+        room_id = self.DBI.get_user_room(self.get_secure_cookie("user"))
         self.DBI.user_left_room(self.get_secure_cookie("user"))
+        # Inform everyone he left
+        
+        
+        if room_id:
+            chat = {
+                "id": str(uuid.uuid4()),
+                "user": "System",
+                "body": "Sorry that command doesn't exist",
+                "time": str(datetime.datetime.now().replace(microsecond=0))
+            }
+            self.inform_room_users(room_id, chat)
+        
+        
 
     @classmethod
     def send_updates(cls, chat):
@@ -49,11 +78,16 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
             if parsed[0] == "/create":
                 room_id = self.DBI.create_room_and_join(EngineSocketHandler.waiters[self])
                 chat["body"] = "/channel " + str(room_id)
+                
+                
             if parsed[0] == "/join":
-                self.DBI.join_player_room(
+                room_id = self.DBI.join_player_room(
                     EngineSocketHandler.waiters[self], parsed[1]
                     )
-            
+                if room_id:
+                    self.inform_room_users(room_id, chat)
+                    
+                        
             
             chat["html"] = tornado.escape.to_basestring(
                 self.render_string("message.html", message=chat))
