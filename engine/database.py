@@ -106,8 +106,8 @@ class databaseInteractions:
             self.execute_raw("INSERT INTO users (username, email, password) VALUES (?,?,?)", (username, email, password))
             self.execute_raw("INSERT INTO user_room (username, room_id, score) VALUES (?,-1,0)", (username,))
             return True
-        else:
-            return False
+        
+        return False
 
 
     def execute_raw(self, *query):

@@ -63,8 +63,11 @@
                     {% if len(info) > 0 %}
                     <div class="ui warning message">{{ escape(info) }}</div>
                     {% end %}
-                    
-                    <div class="ui olive message">
+                    <div class="ui green segment">
+ 
+                        <div class="ui top attached red progress" id="countdown">
+                            <div class="bar"></div>
+                        </div>
                         <div class="header">
                             Opener : #{{ escape(room_id) }}
                         </div>
@@ -97,5 +100,30 @@
         </div>
         
         <script src="{{ static_url('js/cometpuns.js') }}"></script>
+        <script>
+function startTimer(duration) {
+    var percentage = 0;
+    var step = 100/duration;
+    
+    function timer() {
+        percentage += step;
+
+        $('#countdown').progress({
+            percent: percentage
+        });
+        if (percentage >= 100) {
+            clearInterval(refreshIntervalId);
+        }
+    };
+    timer();
+    var refreshIntervalId = setInterval(timer, 1000);
+}
+function startCountdown(seconds){
+    $('#countdown').progress({percent: 0});
+    startTimer(seconds);
+}
+
+
+        </script>
     </body>
 </html>

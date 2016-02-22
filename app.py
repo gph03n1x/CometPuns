@@ -86,6 +86,7 @@ application = tornado.web.Application(
         (r"/auth", AuthHandler, dict(database=DBI)),
         (r"/board", BoardHandler, dict(database=DBI)),
         (r"/admin", AdminHandler, dict(database=DBI)),
+        (r"/profile/([^/]+)", ProfileHandler, dict(database=DBI)),
         (r"/engine", EngineSocketHandler, dict(database=DBI)),
 
     ],

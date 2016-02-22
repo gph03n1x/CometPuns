@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>CometPuns Lobby</title>
+        <link rel="stylesheet" href="{{ static_url('css/cometpuns.css') }}" type="text/css"/>
+        <link rel="stylesheet" href="{{ static_url('semantic/semantic.min.css') }}" type="text/css"/>
+        <script src="{{ static_url('js/jquery-1.12.0.min.js') }}"></script>
+        <script src="{{ static_url('semantic/semantic.min.js') }}"></script>
+    </head>
+    <body>
+        
+        <div class="ui four item menu">
+            <a class="active item">CometPuns</a>
+            <a class="item">About</a>
+            <a class="item">Profile</a>
+            
+            <a class="item" onclick="document.getElementById('logout').submit();">Logout</a>
+            <form id="logout" action="/auth" method="POST" style="display: none;"></form>
+        </div>
+        <div class="ui link cards">
+            <div class="card">
+                <div class="image">
+                    <img src="/images/avatar2/large/matthew.png">
+                </div>
+                <div class="content">
+                    <div class="header">Matt Giampietro</div>
+                    <div class="meta">
+                        <a>Friends</a>
+                    </div>
+                    <div class="description">
+                        Matthew is an interior designer living in New York.
+                    </div>
+                </div>
+                <div class="extra content">
+                    <span class="right floated">
+                        Joined in 2013
+                    </span>
+                    <span>
+                        <i class="user icon"></i>75 Friends
+                    </span>
+                </div>
+            </div>
+        </div>
+        <script src="{{ static_url('js/cometpuns.js') }}"></script>
+    </body>
+</html>
