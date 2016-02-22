@@ -42,6 +42,7 @@ class databaseInteractions:
                 self.execute_raw("DELETE FROM game_room WHERE users=0")
 
     def quick_join_room(self, player_name):
+        self.user_left_room(player_name)
         self.cursor.execute("SELECT * FROM game_room WHERE (users<=? and open='TRUE') ORDER BY users DESC",
                             (self.max_users_per_room,))
         room = self.cursor.fetchone()
@@ -69,14 +70,18 @@ class databaseInteractions:
         return None
     
     def join_player_room(self, player_name, target_player):
+        
         room_id = self.get_user_room(target_player)
-        self.execute_raw("UPDATE game_room SET users=users+1 WHERE id=?", (room_id, ))
-        self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(room_id, player_name))
-        return room_id
+        if room_id:
+            self.user_left_room(player_name)
+            self.execute_raw("UPDATE game_room SET users=users+1 WHERE id=?", (room_id, ))
+            self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(room_id, player_name))
+            return room_id
         
         
     def invite_player_room(self, player_name, target_player):
         pass
+        
         
 
     def authenticate(self, email, password):

@@ -79,7 +79,9 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
             
             if parsed[0] == "/create":
                 room_id = self.DBI.create_room_and_join(EngineSocketHandler.waiters[self])
-                chat["body"] = "/channel " + str(room_id)
+                if room_id:
+                    self.inform_room_users(room_id, chat)
+                    chat["body"] = "/channel " + str(room_id)
                 
                 
             if parsed[0] == "/join":
@@ -114,6 +116,3 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
             chat["html"] = tornado.escape.to_basestring(
                 self.render_string("message.html", message=chat))
             EngineSocketHandler.send_updates(chat)
-            
-            
-            
