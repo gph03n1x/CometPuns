@@ -29,28 +29,28 @@
                             Room Id : #{{ escape(room_id) }}
                         </div>
                     </div>
-                    <table class="ui celled table">
+                    <table class="ui celled table" >
                         <thead>
                             <tr>
                                 <th>Player</th>
                                 <th>Score</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody id="users">
                             <tr>
-                                <td id="{{ escape(user) }}">{{ escape(user) }}</td>
-                                <td id="s-{{ escape(user) }}">0</td>
+                                <td id="u{{ escape(user) }}">{{ escape(user) }}</td>
+                                <td id="s{{ escape(user) }}">0</td>
                             </tr>
                         </tbody>
                     </table>
                     <br>
                     <button class="fluid ui basic button" onclick="sendChat('/create')">Create Room</button>
                     <br>
-                    <button class="fluid ui basic button">Quick Join</button>
+                    <button class="fluid ui basic button" onclick="sendChat('/quickjoin')">Quick Join</button>
                     <br>
                     <div class="fluid ui action input">
-                        <input placeholder="Search..." type="text">
-                        <button class="ui icon button">
+                        <input id="tUser" placeholder="User to join.." type="text">
+                        <button class="ui icon button" onclick="sendChat('/join ' + $('#tUser').val())">
                             <i class="location arrow icon"></i>
                         </button>
                     </div>
