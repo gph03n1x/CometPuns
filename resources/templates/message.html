@@ -1,4 +1,5 @@
-<li class="left clearfix" id="m{{ message["id"] }}"><div class="chat-body clearfix"><div class="header">
-<strong class="primary-font">{% module linkify(message["user"]) %}</strong></div>
-<p>{% module linkify(message["body"]) %}</p>
-</div></li>
+<div id="m{{ message['id'] }}">
+    <a class="ui cyan label">{% module linkify(message["user"]) %}</a>
+    <span>{% module linkify(message["time"]) %}</span>
+    <p>{% module linkify(message["body"]) %}</p>
+</div>

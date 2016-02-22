@@ -16,6 +16,8 @@ class AuthHandler(BaseHandler):
         self.set_cookie('info', '')
 
     def get(self):
+        if self.get_current_user():
+            self.redirect("/")
         self.render("login.html", info=self.info)
 
     def post(self):
@@ -45,3 +47,7 @@ class AuthHandler(BaseHandler):
             else:
                 self.set_cookie('info', 'SMSG2')
                 self.redirect('/auth')
+                
+        else:
+            self.clear_all_cookies()
+            self.redirect('/auth')

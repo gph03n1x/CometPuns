@@ -16,17 +16,11 @@ class LobbyHandler(BaseHandler):
         
     @tornado.web.authenticated
     def get(self):
-        self.DBI.cursor.execute("SELECT * FROM user_lfg_status WHERE username=?",(self.get_current_user(),))
-        uls_res = str(self.DBI.cursor.fetchone()) + "\n"
-        self.DBI.cursor.execute("SELECT * FROM lfg")
-        uls_res += str(self.DBI.cursor.fetchone())
-        self.render("lobby.html", info=self.info, lfg=uls_res)
+        roomid = str(self.DBI.get_user_room(self.get_current_user()))
+        self.render("lobby.html", info=self.info, room_id=roomid, user=self.get_current_user())
     
     @tornado.web.authenticated
     def post(self):
-        self.DBI.update_match_making(self.get_current_user())
-        self.DBI.cursor.execute("SELECT * FROM user_lfg_status WHERE username=?",(self.get_current_user(),))
-        uls_res = str(self.DBI.cursor.fetchone()) + "\n"
-        self.DBI.cursor.execute("SELECT * FROM lfg")
-        uls_res += str(self.DBI.cursor.fetchone())
-        self.render("lobby.html", info=self.info, lfg=uls_res)
+        self.DBI.quick_join_room(self.get_current_user())
+        roomid = str(self.DBI.get_user_room(self.get_current_user()))
+        self.render("lobby.html", info=self.info, room_id=roomid, user=self.get_current_user())

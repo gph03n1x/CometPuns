@@ -1,56 +1,98 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>Crisk Lobby</title>
-
-    <link rel="stylesheet" href='{{ static_url("css/bootstrap.min.css") }}' type="text/css"/>
-    <link rel="stylesheet" href='{{ static_url("css/chat.css") }}' type="text/css"/>
-    <script src="//code.jquery.com/jquery-1.11.2.min.js"></script>
-    <script src="{{ static_url('js/bootstrap.min.js') }}"></script>
-
-
-  <body>
-    <div class="container-fluid">
-      <br>
-      <div class="row">
-        <div class="col-md-7">
-            <div class="alert alert-info">{{ escape(lfg) }}</div>
-            <form method="post" action="/">
-            <button class="btn btn-default" type="submit">Add to lfg</button>
-            </form>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title>CometPuns Lobby</title>
+        <link rel="stylesheet" href="{{ static_url('css/cometpuns.css') }}" type="text/css"/>
+        <link rel="stylesheet" href="{{ static_url('semantic/semantic.min.css') }}" type="text/css"/>
+        <script src="{{ static_url('js/jquery-1.12.0.min.js') }}"></script>
+        <script src="{{ static_url('semantic/semantic.min.js') }}"></script>
+    </head>
+    <body>
+        
+        <div class="ui four item menu">
+            <a class="active item">CometPuns</a>
+            <a class="item">About</a>
+            <a class="item">Profile</a>
+            
+            <a class="item" onclick="document.getElementById('logout').submit();">Logout</a>
+            <form id="logout" action="/auth" method="POST" style="display: none;"></form>
         </div>
-        <div class="col-md-5">
-          {% if len(info) > 0 %}
-            <div class="alert alert-info">{{ escape(info) }}</div>
-          {% end %}
-          <h1 class="page-header">Dashboard</h1>
-  <!-- Start of Chatbox -->
-            <div class="panel panel-primary">
-              <div class="panel-heading">
-                <span class="glyphicon glyphicon-comment"></span> Chat
-              </div>
-              <div class="panel-body">
-                <ul class="chat" >
+        <div class="ui three column grid">
+            <div class="row">
+                <div class="one wide column"></div>
+                <div class="three wide column">
+                    <div class="ui info message">
+                        <div class="header" id="roomId">
+                            Room Id : #{{ escape(room_id) }}
+                        </div>
+                    </div>
+                    <table class="ui celled table">
+                        <thead>
+                            <tr>
+                                <th>Player</th>
+                                <th>Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td id="{{ escape(user) }}">{{ escape(user) }}</td>
+                                <td id="s-{{ escape(user) }}">0</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <button class="fluid ui basic button" onclick="sendChat('/create')">Create Room</button>
+                    <br>
+                    <button class="fluid ui basic button">Quick Join</button>
+                    <br>
+                    <div class="fluid ui action input">
+                        <input placeholder="Search..." type="text">
+                        <button class="ui icon button">
+                            <i class="location arrow icon"></i>
+                        </button>
+                    </div>
 
-                </ul>
-              </div>
-                <div class="panel-footer">
-                    <div class="input-group">
-                        <input id="chat-input" name="message" type="text" class="form-control input-sm" placeholder="Type your message here..." />
+                </div>
+                <div class="eight wide column">
+                    {% if len(info) > 0 %}
+                    <div class="ui warning message">{{ escape(info) }}</div>
+                    {% end %}
+                    
+                    <div class="ui olive message">
+                        <div class="header">
+                            Opener : #{{ escape(room_id) }}
+                        </div>
+                    </div>
+                    
+                    <div class="ui violet message">
+                        <div class="header">
+                            <button class="circular ui icon button"><i class="checkmark icon"></i></button>
+                            Option : #{{ escape(room_id) }}
+                            
+                        </div>
+                        
+                    </div>
+                    
 
+
+
+                    
+                </div>
+                <div class="three wide column">
+                    <h3 class="ui top attached blue header">Chat</h3>
+                    <div class="ui attached segment chat" id="chat">
+                    </div>
+                    <br>
+                    <div class="ui input">
+                        <input id="chat-input" name="message" type="text">
                     </div>
                 </div>
-              </div>
-
-
-  <!-- End of Chatbox -->
+            </div>
         </div>
-      </div>
-    </div>
-    <script src="{{ static_url('js_engine/chat.js') }}"></script>
-  </body>
+        
+        <script src="{{ static_url('js/cometpuns.js') }}"></script>
+    </body>
 </html>

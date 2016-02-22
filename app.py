@@ -23,6 +23,7 @@ import tornado.ioloop
 import tornado.websocket
 import ConfigParser
 
+logging.basicConfig(filename='error.log', level=logging.DEBUG)
 
 import handlers.localization as localization # afora cookie messages
 
@@ -32,11 +33,11 @@ from handlers.auth_handler import AuthHandler
 from handlers.admin_handler import AdminHandler
 from handlers.lobby_handler import LobbyHandler
 from handlers.board_handler import BoardHandler
-from handlers.chat_socket_handler import ChatSocketHandler
+from handlers.engine_socket_handler import EngineSocketHandler
 
 # to engine security einai misleading 
 # kai tha eprepe na einai database stuff mono
-from engine.security import databaseInteractions
+from engine.database import databaseInteractions
 # to engine pou tha trexei sto background
 from engine.engine import Engine
 
@@ -45,18 +46,23 @@ config = ConfigParser.RawConfigParser()
 config.read('cometpuns.cfg') 
 
 
+
 print "[*] Connecting with the database ..."
-# anoigma arxeio vasis dedomenon
+# anoigma arxeiwn vasis dedomenon
+DBP = databaseInteractions(config.get('GENERAL', 'PUNS_FILE'))
 DBI = databaseInteractions(config.get('GENERAL', 'DATABASE_FILE'))
 
 # dimiourgeia sql tables an den iparxoun idi
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS puns (id INTEGER PRIMARY KEY, message)")
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password, uuid)")
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_lfg_status (username, lfg_id)")
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS match_status (id INTEGER PRIMARY KEY, turn, teams, details, completed)")
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS lfg (id INTEGER PRIMARY KEY, players, num, match_key)")
-print "[*] Conection successfull with database: " + config.get('GENERAL', 'DATABASE_FILE')
 
+DBP.execute_raw("CREATE TABLE IF NOT EXISTS puns (id INTEGER PRIMARY KEY, content, category)")
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password, uuid)")
+
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id, score INTEGER)")
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS chat_room (room_id, users)")
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS game_room (id INTEGER PRIMARY KEY, users INTEGER, open, details)")
+
+print "[+] Conection successfull with database: " + config.get('GENERAL', 'DATABASE_FILE')
+print "[+] Conection successfull with puns: " + config.get('GENERAL', 'DATABASE_FILE')
 # ekinisi toy engine pou tha trexei sto background
 # otan ilopoiithei
 Engine(DBI)
@@ -68,6 +74,7 @@ Engine(DBI)
 settings = {
     "cookie_secret": "sVvW58QWgjAld7DK2FnOUzZLmoQgvlqDIh6mPYC8HDWanE5GqYy6v3Uu2ivKG36O",
     "login_url": "/auth",
+    #"xsrf_cookies": True,
 }
 
 # sindeei sto app ta urls me tous handlers tous
@@ -78,7 +85,7 @@ application = tornado.web.Application(
         (r"/auth", AuthHandler, dict(database=DBI)),
         (r"/board", BoardHandler, dict(database=DBI)),
         (r"/admin", AdminHandler, dict(database=DBI)),
-        (r"/chatsocket", ChatSocketHandler, dict(database=DBI)),
+        (r"/engine", EngineSocketHandler, dict(database=DBI)),
 
     ],
     debug=True,

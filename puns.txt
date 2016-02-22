@@ -1,0 +1,9 @@
+[Responses]
+
+so i used a bunch of goto's
+but have you tried turning it off and on ?
+which results to a blue screen of death.
+
+[Openers]
+
+I made a random number generator
