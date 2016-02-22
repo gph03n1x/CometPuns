@@ -48,6 +48,7 @@ class databaseInteractions:
             create_room_and_join(player_name)
         
     def create_room_and_join(self, player_name):
+        self.user_left_room(player_name)
         room_id = self.execute_raw(
             "INSERT INTO game_room (users, open, details) VALUES (1, 'TRUE', ?)", (str({}), )
                                 )

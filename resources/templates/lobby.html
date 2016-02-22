@@ -43,6 +43,18 @@
                             </tr>
                         </tbody>
                     </table>
+                    <br>
+                    <button class="fluid ui basic button" onclick="sendChat('/create')">Create Room</button>
+                    <br>
+                    <button class="fluid ui basic button">Quick Join</button>
+                    <br>
+                    <div class="fluid ui action input">
+                        <input placeholder="Search..." type="text">
+                        <button class="ui icon button">
+                            <i class="location arrow icon"></i>
+                        </button>
+                    </div>
+
                 </div>
                 <div class="eight wide column">
                     {% if len(info) > 0 %}
@@ -57,7 +69,7 @@
                     
                     <div class="ui violet message">
                         <div class="header">
-                            <button class="ui button">Choose</button>
+                            <button class="circular ui icon button"><i class="checkmark icon"></i></button>
                             Option : #{{ escape(room_id) }}
                             
                         </div>
