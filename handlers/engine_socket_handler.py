@@ -30,18 +30,20 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
             chat["html"] = tornado.escape.to_basestring(
                 self.render_string("message.html", message=chat))
             for i in users:
-                EngineSocketHandler.users[i[0]].write_message(chat)
-            
-
+                try:
+                    EngineSocketHandler.users[i[0]].write_message(chat)
+                except KeyError:
+                    pass
+                    
+        
     def on_close(self):
         del EngineSocketHandler.waiters[self]
         del EngineSocketHandler.users[self.get_secure_cookie("user")]
         # Remove player from his room
         room_id = self.DBI.get_user_room(self.get_secure_cookie("user"))
         self.DBI.user_left_room(self.get_secure_cookie("user"))
+        
         # Inform everyone he left
-        
-        
         if room_id:
             chat = {
                 "id": str(uuid.uuid4()),
@@ -86,7 +88,13 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                     )
                 if room_id:
                     self.inform_room_users(room_id, chat)
+                    chat["body"] = "/channel " + str(room_id)
                     
+            if parsed[0] == "/quickjoin":
+                room_id = self.DBI.quick_join_room(EngineSocketHandler.waiters[self])
+                if room_id:
+                    self.inform_room_users(room_id, chat)
+                    chat["body"] = "/channel " + str(room_id)
                         
             
             chat["html"] = tornado.escape.to_basestring(

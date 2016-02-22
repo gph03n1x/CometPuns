@@ -50,7 +50,8 @@ class databaseInteractions:
             self.execute_raw("UPDATE game_room SET users=? WHERE id=?", (int(room[1])+1, room[0]))
             self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(room[0], player_name))
         else:
-            create_room_and_join(player_name)
+            room_id = create_room_and_join(player_name)
+        return room_id
         
     def create_room_and_join(self, player_name):
         self.user_left_room(player_name)
