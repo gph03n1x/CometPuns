@@ -58,7 +58,7 @@ DBI = databaseInteractions(config.get('GENERAL', 'DATABASE_FILE'))
 DBP.execute_raw("CREATE TABLE IF NOT EXISTS puns (id INTEGER PRIMARY KEY, content, category)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password, uuid)")
 
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id, score INTEGER, ready)")
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id, score INTEGER, ready, choices, choice)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS chat_room (room_id, users)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS game_room (id INTEGER PRIMARY KEY, users INTEGER, open, details)")
 
