@@ -34,6 +34,7 @@
                       </div>
                       <button class="ui blue submit button" type="submit">Sign in</button>
                   </div>
+                  {% module xsrf_form_html() %}
               </form>
           </div>
           <div class="ui bottom attached tab segment" data-tab="register">
@@ -62,6 +63,7 @@
                       </div>
                       <button class="ui blue submit button" type="submit">Sign Up</button>
                   </div>
+              {% module xsrf_form_html() %}
               </form>
           </div>
           {% if len(info) > 0 %}

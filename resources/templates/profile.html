@@ -18,7 +18,7 @@
             <a class="item">Profile</a>
             
             <a class="item" onclick="document.getElementById('logout').submit();">Logout</a>
-            <form id="logout" action="/auth" method="POST" style="display: none;"></form>
+            <form id="logout" action="/auth" method="POST" style="display: none;">{% module xsrf_form_html() %}</form>
         </div>
         <div class="ui link cards">
             <div class="card">
