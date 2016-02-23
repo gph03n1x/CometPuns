@@ -12,68 +12,103 @@ config.read('cometpuns.cfg')
 
 class databaseInteractions:
     
+    
     def __init__(self, dbfile):
+        # creates a class attribute with a connection
+        # to the database file
         self.connection = sqlite3.connect(dbfile)
+        # creates an attribute which includes the cursor
         self.cursor = self.connection.cursor()
+        # sets the max users allowed by the system in a channel
         self.max_users_per_room = config.get('GENERAL', 'MAX_USERS_PER_ROOM')
-        
+
+
     def get_user_room(self, player_name):
+        # searches the user_room for a room_id
+        # associated with the given username
         self.cursor.execute("SELECT * FROM user_room WHERE username=?",(player_name,))
         user_room = self.cursor.fetchone()
         if user_room:
+            # if there are results we return them
             return user_room[1]
+        # else the user doesn't exist because
+        # if he did we would return id = -1 since
+        # since he isn't inside a channel
         return None
-        
+
+
     def user_left_room(self, player_name):
+        # we get user's current room
         user_room = self.get_user_room(player_name)
-        
+        # if there isnt any we return -1
         if not user_room:
             return -1
-        
+        # if the room's id isn't -1
         if int(user_room) != -1:
-            self.cursor.execute(
-                "SELECT * FROM game_room WHERE id=?", (user_room,)
-                            )
-            
+            # we subtract 1 from the game_room users
+            self.cursor.execute("SELECT * FROM game_room WHERE id=?", (user_room,))
             room = self.cursor.fetchone()
             self.execute_raw("UPDATE game_room SET users=? WHERE id=?", (int(room[1])-1, room[0]))
+            # we now associate the user with an empty room
             self.execute_raw("UPDATE user_room SET room_id=-1 WHERE username=?",(player_name, ))
-            if int(room[1]-1) == 0:
+            if int(room[1])-1 == 0:
+                # if the game_room has 0 users we remove it from the database
                 self.execute_raw("DELETE FROM game_room WHERE users=0")
+            # we return the room's id 
             return room[0]
 
+
     def quick_join_room(self, player_name):
+        # we remove the user from his current room
         self.user_left_room(player_name)
+        # we search for rooms which are open to join
+        # and haven't reached yet max users
         self.cursor.execute("SELECT * FROM game_room WHERE (users<=? and open='TRUE') ORDER BY users DESC",
                             (self.max_users_per_room,))
         room = self.cursor.fetchone()
         if room:
+            # if there is such a room we increment its users
+            # and we associate the user with his new room
             room_id = room[0]
             self.execute_raw("UPDATE game_room SET users=? WHERE id=?", (int(room[1])+1, room[0]))
             self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(room[0], player_name))
         else:
-            room_id = create_room_and_join(player_name)
+            # else we create a new one and we join it ourselves
+            room_id = self.create_room_and_join(player_name)
         return room_id
-        
+
+
     def create_room_and_join(self, player_name):
+        # we remove the user from his current room
         self.user_left_room(player_name)
+        # we create a new room for him
         room_id = self.execute_raw(
             "INSERT INTO game_room (users, open, details) VALUES (1, 'TRUE', ?)", (str({}), )
                                 )
+        # and we are associating him with it
         self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(str(room_id), player_name))
         return room_id
     
+    
     def list_room_users(self, room_id):
+        # Executes an sql query which fetches
+        # all users in a room
         self.cursor.execute("SELECT * FROM user_room WHERE room_id=?",(room_id,))
         users = self.cursor.fetchall()
         if users:
+            # if there are users then we return them
             return users
+        # else we return None hence the channel doesn't exist
         return None
     
+    
     def join_player_room(self, player_name, target_player):
-        
+        # Fetches the id of the room from the user
+        # we want to join
         room_id = self.get_user_room(target_player)
         if room_id:
+            # if he is in a room then we leave our current room
+            # and then we join the room with the new id
             self.user_left_room(player_name)
             self.execute_raw("UPDATE game_room SET users=users+1 WHERE id=?", (room_id, ))
             self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(room_id, player_name))
@@ -86,31 +121,39 @@ class databaseInteractions:
         
 
     def authenticate(self, email, password):
-        #print "Auth call for \'{0}\'".format(email)
+        # Fetches any row in the database where
+        # the email and the password match
         self.cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (email,password))
         return self.cursor.fetchone()
     
     
     def get_user_uuid(self, username):
+        # Fetches the current uuid
         self.cursor.execute("SELECT uuid FROM users WHERE username=?", (username,))
         return self.cursor.fetchone()
     
     
     def update_uuid(self, username, _uuid):
+        # Update the uuid field of the user
         self.execute_raw("UPDATE users SET uuid=? WHERE username=?",(str(_uuid),username))
 
 
     def register(self, username, email, password):
-        self.cursor.execute("SELECT * FROM users WHERE email=?", (email,))
+        # Checks if there are already entries with the same email or the same username
+        self.cursor.execute("SELECT * FROM users WHERE email=? OR username=?", (email,username))
         if str(self.cursor.fetchone()) == "None":
+            # If there aren't any then we create a new user row along with a user_room association
             self.execute_raw("INSERT INTO users (username, email, password) VALUES (?,?,?)", (username, email, password))
             self.execute_raw("INSERT INTO user_room (username, room_id, score) VALUES (?,-1,0)", (username,))
             return True
-        
+        # return false since the user already exists
         return False
 
 
     def execute_raw(self, *query):
+        # method for executing queries and fetching the
+        # lastrowid so we can do that in one line and we
+        # can avoid cluttering
         self.cursor.execute(*query)
         self.connection.commit()
         return self.cursor.lastrowid

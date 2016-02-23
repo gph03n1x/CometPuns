@@ -38,7 +38,7 @@ class AuthHandler(BaseHandler):
         if len(self.get_arguments('email')) >0 and len(self.get_arguments('password')) > 0:
             username = self.DBI.authenticate(self.get_arguments('email')[0], self.get_arguments('password')[0])
             if username:
-                r_uuid = str(uuid.uuid4())
+                r_uuid = str(uuid.uuid4()) # generate a random uuid
                 self.DBI.update_uuid(username[1], r_uuid)
                 self.set_secure_cookie("user", username[1])
                 self.set_secure_cookie("uuid", r_uuid)
