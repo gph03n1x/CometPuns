@@ -17,6 +17,7 @@
           </div>
           <div class="ui bottom attached tab segment active" data-tab="login">
               <form class="form-signin" action="/auth" method="post" name="login">
+                  {% module xsrf_form_html() %}
                   <div class="ui form">
                       <div class="field">
                           <label>Email address</label>
@@ -34,11 +35,11 @@
                       </div>
                       <button class="ui blue submit button" type="submit">Sign in</button>
                   </div>
-                  {% module xsrf_form_html() %}
               </form>
           </div>
           <div class="ui bottom attached tab segment" data-tab="register">
               <form class="form-signin" action="/auth" method="post" name="register">
+                  {% module xsrf_form_html() %}
                   <div class="ui form">
                       <div class="field">
                           <label>Username</label>
@@ -63,7 +64,6 @@
                       </div>
                       <button class="ui blue submit button" type="submit">Sign Up</button>
                   </div>
-              {% module xsrf_form_html() %}
               </form>
           </div>
           {% if len(info) > 0 %}
