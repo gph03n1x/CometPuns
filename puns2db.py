@@ -6,10 +6,18 @@ connection = sqlite3.connect("database/puns.db")
 cursor = connection.cursor()
 
 with open("puns.txt", "r") as puns:
-    for punline in puns:
-        splitp = punline.find("[")
-        cursor.execute("INSERT INTO puns (content, category) VALUES (?,?)", (punline[:splitp], punline[splitp+1:-2]))
+    cont = puns.read()
+    cont = cont.split("==========================================")
+    
+    for line in cont[0]:
+        cursor.execute("INSERT INTO openers (content) VALUES (?)", (line,))
         connection.commit()
+        pass
+    
+    for line in cont[1]:
+        cursor.execute("INSERT INTO responses (content) VALUES (?)", (line,))
+        connection.commit()
+        pass
 
 connection.close()
 print "DONE"

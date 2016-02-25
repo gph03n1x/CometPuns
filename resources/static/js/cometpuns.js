@@ -57,15 +57,11 @@ var updater = {
                 $("#roomId").text( "Room Id : #"+command[1]);
             }
             if (command[0] == "/users") {
-                console.log("here we go");
                 $('#users > tr').remove();
-                console.log("here we go - 2");
                 for (var i = 1; i < arrayLength; i++) {
-                    console.log("here we go - 3");
                     var data = command[i].split(":")
                     $('#users').append("<tr id='td"+data[0]+"' class='error'><td id='u"+data[0]+"'>"+data[0]+"</td><td id='s"+data[0]+"'>"+data[1]+"</td></tr>");
                 }
-                console.log("here we go - 4");
             }
         }
         var existing = $("#m" + message.id);

@@ -1,10 +1,11 @@
-I made a random number generator, [Openers]
-I would love to change the world, [Openers]
-I became a programmer, [Openers]
-I am trying to date this girl, [Openers]
-so i used a bunch of goto's. [Responses]
-but have you tried turning it off and on? [Responses]
-which results to a blue screen of death. [Responses]
-but they won't give me the source code. [Responses]
-so i made a github dating site. [Responses]
-a tool to convert caffeine into code. [Responses]
+I made a random number generator
+I would love to change the world,
+I became a programmer,
+I am trying to date this girl,
+so i used a bunch of goto's.
+==========================================
+but have you tried turning it off and on?
+which results to a blue screen of death.
+but they won't give me the source code.
+so i made a github dating site.
+a tool to convert caffeine into code.
