@@ -24,7 +24,7 @@
             <div class="row">
                 <div class="one wide column"></div>
                 <div class="three wide column">
-                    <button class="fluid ui basic negative button" onclick="sendChat('/leave')">
+                    <button class="fluid ui basic red button" onclick="refreshRooms('/leave')">
                         Leave room
                     </button>
                     <div class="ui info message">
@@ -47,15 +47,15 @@
                         </tbody>
                     </table>
                     <br>
-                    <button class="fluid ui positive basic button" onclick="sendChat('/ready')">Ready</button>
+                    <button class="fluid ui green basic button" onclick="refreshRooms('/ready')">Ready</button>
                     <br>
-                    <button class="fluid ui basic button" onclick="sendChat('/create')">Create Room</button>
+                    <button class="fluid ui basic button" onclick="refreshRooms('/create')">Create Room</button>
                     <br>
-                    <button class="fluid ui basic button" onclick="sendChat('/quickjoin')">Quick Join</button>
+                    <button class="fluid ui basic button" onclick="refreshRooms('/quickjoin')">Quick Join</button>
                     <br>
                     <div class="fluid ui action input">
                         <input id="tUser" placeholder="User to join.." type="text">
-                        <button class="ui icon button" onclick="sendChat('/join ' + $('#tUser').val())">
+                        <button class="ui icon button" onclick="refreshRooms('/join ' + $('#tUser').val())">
                             <i class="location arrow icon"></i>
                         </button>
                     </div>
@@ -65,15 +65,10 @@
                     {% if len(info) > 0 %}
                     <div class="ui warning message">{{ escape(info) }}</div>
                     {% end %}
-                    <div class="ui green segment">
- 
-                        <div class="ui top attached red progress" id="countdown">
-                            <div class="bar"></div>
-                        </div>
-                        <div class="header">
-                            Opener : #{{ escape(room_id) }}
-                        </div>
+                    <div id="opener">
+                        
                     </div>
+                    <br>
                     <div id="options">
                         <div class="ui violet message">
                             <div class="header">

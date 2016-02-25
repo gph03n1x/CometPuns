@@ -32,7 +32,10 @@ function startCountdown(seconds){
     startTimer(seconds);
 }
 
-
+function refreshRooms(command) {
+    $(".positive").removeClass( "positive" ).addClass( "error" );
+    sendChat(command);
+}
 
 var updater = {
     socket: null,
@@ -50,6 +53,10 @@ var updater = {
             var command = message.body.split(" ");
             var arrayLength = command.length;
             console.log(command);
+            if (command[0] == "/opener") {
+                $("#opener").empty();
+                $("#opener").append(message.opener_html);
+            }
             if (command[0] == "/isready") {
                 $("#td"+command[1]).removeClass( "error" ).addClass( "positive" );
             }

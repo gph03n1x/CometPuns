@@ -2,10 +2,10 @@ I made a random number generator
 I would love to change the world,
 I became a programmer,
 I am trying to date this girl,
-so i used a bunch of goto's.
 ==========================================
 but have you tried turning it off and on?
 which results to a blue screen of death.
 but they won't give me the source code.
 so i made a github dating site.
 a tool to convert caffeine into code.
+so i used a bunch of goto's.

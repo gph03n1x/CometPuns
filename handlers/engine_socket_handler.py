@@ -10,8 +10,9 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
     waiters = {}
     users = {}
 
-    def initialize(self, database):
+    def initialize(self, database, puns):
         self.DBI = database
+        self.DBP = puns
 
     def get_compression_options(self):
         # Non-None enables compression with default options.
@@ -120,6 +121,16 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                     self.DBI.user_is_ready(EngineSocketHandler.waiters[self])
                     chat["body"] = "/isready " + EngineSocketHandler.waiters[self]
                     self.inform_room_about(room_id, chat)
+                    
+                    if self.DBI.everyone_is_ready(room_id):
+                        opener = self.DBP.get_random_opener()
+                        chat["body"] = "/opener"
+                        chat["opener_id"] = str(opener[0])
+                        chat["opener_body"] = str(opener[1])
+                        chat["opener_html"] = tornado.escape.to_basestring(
+                            self.render_string("opener.html", message=chat))
+                        
+                        self.inform_room_about(room_id, chat)
                         
             
             chat["html"] = tornado.escape.to_basestring(

@@ -38,7 +38,7 @@ from handlers.engine_socket_handler import EngineSocketHandler
 
 # to engine security einai misleading 
 # kai tha eprepe na einai database stuff mono
-from engine.database import databaseInteractions
+from engine.database import databaseInteractions, databasePuns
 # to engine pou tha trexei sto background
 from engine.engine import Engine
 
@@ -50,17 +50,11 @@ config.read('cometpuns.cfg')
 
 print "[*] Connecting with the database ..."
 # anoigma arxeiwn vasis dedomenon
-DBP = databaseInteractions(config.get('GENERAL', 'PUNS_FILE'))
+DBP = databasePuns(config.get('GENERAL', 'PUNS_FILE'))
 DBI = databaseInteractions(config.get('GENERAL', 'DATABASE_FILE'))
 
 # dimiourgeia sql tables an den iparxoun idi
-
-DBP.execute_raw("CREATE TABLE IF NOT EXISTS openers (id INTEGER PRIMARY KEY, content)")
-DBP.execute_raw("CREATE TABLE IF NOT EXISTS responses (id INTEGER PRIMARY KEY, content)")
-
-
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password, uuid)")
-
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id, score INTEGER, ready, choices, choice)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS game_room (id INTEGER PRIMARY KEY, users INTEGER, open, details)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS chat_room (room_id, users)")
@@ -91,7 +85,7 @@ application = tornado.web.Application(
         (r"/board", BoardHandler, dict(database=DBI)),
         (r"/admin", AdminHandler, dict(database=DBI)),
         (r"/profile/([^/]+)", ProfileHandler, dict(database=DBI)),
-        (r"/engine", EngineSocketHandler, dict(database=DBI)),
+        (r"/engine", EngineSocketHandler, dict(database=DBI, puns=DBP)),
 
     ],
     debug=True,
