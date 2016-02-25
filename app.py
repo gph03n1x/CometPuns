@@ -73,7 +73,7 @@ Engine(DBI)
 settings = {
     "cookie_secret": "sVvW58QWgjAld7DK2FnOUzZLmoQgvlqDIh6mPYC8HDWanE5GqYy6v3Uu2ivKG36O",
     "login_url": "/auth",
-    #"xsrf_cookies": True,
+    "xsrf_cookies": True,
 }
 
 # sindeei sto app ta urls me tous handlers tous
