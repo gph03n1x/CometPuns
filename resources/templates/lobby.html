@@ -74,16 +74,15 @@
                             Opener : #{{ escape(room_id) }}
                         </div>
                     </div>
-                    
-                    <div class="ui violet message">
-                        <div class="header">
-                            <button class="circular ui icon button"><i class="checkmark icon"></i></button>
-                            Option : #{{ escape(room_id) }}
-                            
+                    <div id="options">
+                        <div class="ui violet message">
+                            <div class="header">
+                                <button class="circular ui icon button"><i class="checkmark icon"></i></button>
+                                Option : #{{ escape(room_id) }}
+                                
+                            </div>
                         </div>
-                        
                     </div>
-                    
 
 
 
@@ -102,30 +101,5 @@
         </div>
         
         <script src="{{ static_url('js/cometpuns.js') }}"></script>
-        <script>
-function startTimer(duration) {
-    var percentage = 0;
-    var step = 100/duration;
-    
-    function timer() {
-        percentage += step;
-
-        $('#countdown').progress({
-            percent: percentage
-        });
-        if (percentage >= 100) {
-            clearInterval(refreshIntervalId);
-        }
-    };
-    timer();
-    var refreshIntervalId = setInterval(timer, 1000);
-}
-function startCountdown(seconds){
-    $('#countdown').progress({percent: 0});
-    startTimer(seconds);
-}
-
-
-        </script>
     </body>
 </html>

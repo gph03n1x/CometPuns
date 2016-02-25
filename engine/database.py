@@ -71,7 +71,7 @@ class databaseInteractions:
             # and we associate the user with his new room
             room_id = room[0]
             self.execute_raw("UPDATE game_room SET users=? WHERE id=?", (int(room[1])+1, room[0]))
-            self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(room[0], player_name))
+            self.execute_raw("UPDATE user_room SET room_id=? AND ready=0 WHERE username=?",(room[0], player_name))
         else:
             # else we create a new one and we join it ourselves
             room_id = self.create_room_and_join(player_name)
@@ -118,7 +118,25 @@ class databaseInteractions:
     def invite_player_room(self, player_name, target_player):
         pass
         
+    def user_is_ready(self, player_name):
+        self.execute_raw("UPDATE user_room SET ready=1 WHERE username=?",(player_name, ))
+    
+    def everyone_is_ready(self, room_id):
+        users = self.list_room_users(room_id)
+        self.cursor.execute("SELECT * FROM game_room WHERE room_id=?",(room_id,))
+        user_count = self.cursor.fetchone()
+        if not user_count or not users:
+            return False
         
+        ready_count = 0
+        for user in users:
+            if user[3] == "1":
+                ready_count = ready_count + 1
+                
+        if ready_count == int(user_count[1]):
+            return True
+        return False
+            
 
     def authenticate(self, email, password):
         # Fetches any row in the database where
@@ -144,7 +162,7 @@ class databaseInteractions:
         if str(self.cursor.fetchone()) == "None":
             # If there aren't any then we create a new user row along with a user_room association
             self.execute_raw("INSERT INTO users (username, email, password) VALUES (?,?,?)", (username, email, password))
-            self.execute_raw("INSERT INTO user_room (username, room_id, score) VALUES (?,-1,0)", (username,))
+            self.execute_raw("INSERT INTO user_room (username, room_id, score,ready) VALUES (?,-1,0,0)", (username,))
             return True
         # return false since the user already exists
         return False

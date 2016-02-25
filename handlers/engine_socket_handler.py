@@ -35,6 +35,17 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 except KeyError:
                     pass
                     
+    def inform_room_about(self, room_id, chat):
+        users = self.DBI.list_room_users(room_id)
+        if users:
+            
+            chat["html"] = tornado.escape.to_basestring(
+                self.render_string("message.html", message=chat))
+            for i in users:
+                try:
+                    EngineSocketHandler.users[i[0]].write_message(chat)
+                except KeyError:
+                    pass
         
     def on_close(self):
         del EngineSocketHandler.waiters[self]
@@ -102,6 +113,13 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 if room_id:
                     self.inform_room_users(room_id, chat)
                     chat["body"] = "/channel " + str(room_id)
+                    
+            if parsed[0] == "/ready":
+                room_id = self.DBI.get_user_room(EngineSocketHandler.waiters[self])
+                if room_id:
+                    self.DBI.user_is_ready(EngineSocketHandler.waiters[self])
+                    chat["body"] = "/isready " + EngineSocketHandler.waiters[self]
+                    self.inform_room_about(room_id, chat)
                         
             
             chat["html"] = tornado.escape.to_basestring(

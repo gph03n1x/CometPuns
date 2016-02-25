@@ -9,6 +9,31 @@ jQuery.fn.formToDict = function() {
     return json;
 };
 
+function startTimer(duration) {
+    var percentage = 0;
+    var step = 100/duration;
+    
+    function timer() {
+        percentage += step;
+
+        $('#countdown').progress({
+            percent: percentage
+        });
+        if (percentage >= 100) {
+            clearInterval(refreshIntervalId);
+        }
+    };
+    timer();
+    var refreshIntervalId = setInterval(timer, 1000);
+}
+
+function startCountdown(seconds){
+    $('#countdown').progress({percent: 0});
+    startTimer(seconds);
+}
+
+
+
 var updater = {
     socket: null,
 
@@ -25,6 +50,9 @@ var updater = {
             var command = message.body.split(" ");
             var arrayLength = command.length;
             console.log(command);
+            if (command[0] == "/isready") {
+                $("#td"+command[1]).removeClass( "error" ).addClass( "positive" );
+            }
             if (command[0] == "/channel") {
                 $("#roomId").text( "Room Id : #"+command[1]);
             }
@@ -35,7 +63,7 @@ var updater = {
                 for (var i = 1; i < arrayLength; i++) {
                     console.log("here we go - 3");
                     var data = command[i].split(":")
-                    $('#users').append("<tr><td id='u"+data[0]+"'>"+data[0]+"</td><td id='s"+data[0]+"'>"+data[1]+"</td></tr>");
+                    $('#users').append("<tr id='td"+data[0]+"' class='error'><td id='u"+data[0]+"'>"+data[0]+"</td><td id='s"+data[0]+"'>"+data[1]+"</td></tr>");
                 }
                 console.log("here we go - 4");
             }
