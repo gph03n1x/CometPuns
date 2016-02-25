@@ -77,76 +77,79 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         parsed = tornado.escape.json_decode(message)
-        
-        if parsed[0] == "/":
-            # process request
-            logging.debug("Command: " + parsed)
-            chat = {
-                "id": str(uuid.uuid4()),
-                "user": "System",
-                "body": "Sorry that command doesn't exist",
-                "time": str(datetime.datetime.now().replace(microsecond=0))
-            }
-            parsed = parsed.split()
-            if parsed[0] == "/leave":
-                room_id = self.DBI.user_left_room(self.get_secure_cookie("user"))
-                if room_id > 0:
-                    self.inform_room_users(room_id, chat)
-                    chat["body"] = "/channel -1"
-            
-            if parsed[0] == "/create":
-                room_id = self.DBI.create_room_and_join(EngineSocketHandler.waiters[self])
-                if room_id:
-                    self.inform_room_users(room_id, chat)
-                    chat["body"] = "/channel " + str(room_id)
+        try:
+            if parsed[0] == "/":
+                # process request
+                logging.debug("Command: " + parsed)
+                chat = {
+                    "id": str(uuid.uuid4()),
+                    "user": "System",
+                    "body": "Sorry that command doesn't exist",
+                    "time": str(datetime.datetime.now().replace(microsecond=0))
+                }
+                parsed = parsed.split()
+                if parsed[0] == "/leave":
+                    room_id = self.DBI.user_left_room(self.get_secure_cookie("user"))
+                    if room_id > 0:
+                        self.inform_room_users(room_id, chat)
+                        chat["body"] = "/channel -1"
                 
-                
-            if parsed[0] == "/join":
-                room_id = self.DBI.join_player_room(
-                    EngineSocketHandler.waiters[self], parsed[1]
-                    )
-                if room_id:
-                    self.inform_room_users(room_id, chat)
-                    chat["body"] = "/channel " + str(room_id)
+                if parsed[0] == "/create":
+                    room_id = self.DBI.create_room_and_join(EngineSocketHandler.waiters[self])
+                    if room_id:
+                        self.inform_room_users(room_id, chat)
+                        chat["body"] = "/channel " + str(room_id)
                     
-            if parsed[0] == "/quickjoin":
-                room_id = self.DBI.quick_join_room(EngineSocketHandler.waiters[self])
-                if room_id:
-                    self.inform_room_users(room_id, chat)
-                    chat["body"] = "/channel " + str(room_id)
                     
-            if parsed[0] == "/ready":
-                room_id = self.DBI.get_user_room(EngineSocketHandler.waiters[self])
-                if room_id:
-                    self.DBI.user_is_ready(EngineSocketHandler.waiters[self])
-                    chat["body"] = "/isready " + EngineSocketHandler.waiters[self]
-                    self.inform_room_about(room_id, chat)
-                    
-                    if self.DBI.everyone_is_ready(room_id):
-                        opener = self.DBP.get_random_opener()
-                        chat["body"] = "/opener"
-                        chat["opener_id"] = str(opener[0])
-                        chat["opener_body"] = str(opener[1])
-                        chat["opener_html"] = tornado.escape.to_basestring(
-                            self.render_string("opener.html", message=chat))
+                if parsed[0] == "/join":
+                    room_id = self.DBI.join_player_room(
+                        EngineSocketHandler.waiters[self], parsed[1]
+                        )
+                    if room_id:
+                        self.inform_room_users(room_id, chat)
+                        chat["body"] = "/channel " + str(room_id)
                         
+                if parsed[0] == "/quickjoin":
+                    room_id = self.DBI.quick_join_room(EngineSocketHandler.waiters[self])
+                    if room_id:
+                        self.inform_room_users(room_id, chat)
+                        chat["body"] = "/channel " + str(room_id)
+                        
+                if parsed[0] == "/ready":
+                    room_id = self.DBI.get_user_room(EngineSocketHandler.waiters[self])
+                    if room_id:
+                        self.DBI.user_is_ready(EngineSocketHandler.waiters[self])
+                        chat["body"] = "/isready " + EngineSocketHandler.waiters[self]
                         self.inform_room_about(room_id, chat)
                         
-            
-            chat["html"] = tornado.escape.to_basestring(
-                self.render_string("message.html", message=chat))
-            
-            self.write_message(chat)
-            
-        else:
-            
-            chat = {
-                "id": str(uuid.uuid4()),
-                "user": EngineSocketHandler.waiters[self],
-                "body": parsed,
-                "time": str(datetime.datetime.now().replace(microsecond=0))
-                }
- 
-            chat["html"] = tornado.escape.to_basestring(
-                self.render_string("message.html", message=chat))
-            EngineSocketHandler.send_updates(chat)
+                        if self.DBI.everyone_is_ready(room_id):
+                            opener = self.DBP.get_random_opener()
+                            chat["body"] = "/opener"
+                            chat["opener_id"] = str(opener[0])
+                            chat["opener_body"] = str(opener[1])
+                            chat["opener_html"] = tornado.escape.to_basestring(
+                                self.render_string("opener.html", message=chat))
+                            
+                            self.inform_room_about(room_id, chat)
+                            
+                
+                chat["html"] = tornado.escape.to_basestring(
+                    self.render_string("message.html", message=chat))
+                
+                self.write_message(chat)
+                
+            else:
+                
+                chat = {
+                    "id": str(uuid.uuid4()),
+                    "user": EngineSocketHandler.waiters[self],
+                    "body": parsed,
+                    "time": str(datetime.datetime.now().replace(microsecond=0))
+                    }
+     
+                chat["html"] = tornado.escape.to_basestring(
+                    self.render_string("message.html", message=chat))
+                EngineSocketHandler.send_updates(chat)
+        except IndexError:
+            logging.error("Message which caused indexError")
+            logging.error(str(message))
