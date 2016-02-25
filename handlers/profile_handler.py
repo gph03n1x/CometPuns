@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import tornado.web
-import re
+import urllib2
 import logging
 
 from handlers.base_handler import BaseHandler
@@ -14,10 +14,13 @@ class ProfileHandler(BaseHandler):
             user = self.get_secure_cookie("user")
         self.render("profile.html")
 
-    def test_avatar(self, test_file):
-        self.r_image = self.re._compile(r".*\.(jpg|jpeg|jpe|png|pns|gif|)")
+    def test_avatar(self, url):
+        response = urllib2.urlopen(HeadRequest(url))
+        maintype = response.headers['Content-Type'].split(';')[0].lower()
 
-        if self.r_image.match(test_file):
-            pass
-        else:
-            self.logging.debug('This in not a valid image type')
+        if maintype not in ('Image/png', 'Image/pns', 'Image/gif', 'Image/jpg', 'Image/jpeg', 'Image/jpe'):
+            logging.debug('invalid type of image')
+
+class HeadRequest(urllib2.Request):
+    def get_method(self):
+        return 'HEAD'
