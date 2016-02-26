@@ -53,9 +53,12 @@ var updater = {
             var command = message.body.split(" ");
             var arrayLength = command.length;
             console.log(command);
+            if (command[0] == "/choice") {
+                $("#options").append(message.data_html);
+            }
             if (command[0] == "/opener") {
                 $("#opener").empty();
-                $("#opener").append(message.opener_html);
+                $("#opener").append(message.data_html);
             }
             if (command[0] == "/isready") {
                 $("#td"+command[1]).removeClass( "error" ).addClass( "positive" );

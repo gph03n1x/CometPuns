@@ -123,12 +123,25 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                         if self.DBI.everyone_is_ready(room_id):
                             opener = self.DBP.get_random_opener()
                             chat["body"] = "/opener"
-                            chat["opener_id"] = str(opener[0])
-                            chat["opener_body"] = str(opener[1])
-                            chat["opener_html"] = tornado.escape.to_basestring(
+                            chat["data_id"] = str(opener[0])
+                            chat["data_body"] = str(opener[1])
+                            chat["data_html"] = tornado.escape.to_basestring(
                                 self.render_string("opener.html", message=chat))
                             
                             self.send_updates(room_id, chat)
+
+                            r_users = self.DBI.list_room_users(room_id)
+                            responses = self.DBP.generate_random_responses(len(r_users))
+                            for user in r_users:
+                                for option in range(self.DBP.options_per_player):
+                                    data = responses.pop()
+                                    chat["body"] = "/choice"
+                                    chat["data_id"] = str(data[0])
+                                    chat["data_body"] = str(data[1])
+                                    chat["data_html"] = tornado.escape.to_basestring(
+                                        self.render_string("choice.html", message=chat))
+                                    self.users[user[0]].write_message(chat)
+                            
                         
                 if room_id:
                     self.inform_room_users(room_id)
@@ -153,5 +166,5 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 )
                 
         except IndexError:
-            logging.error("Message which caused indexError")
-            logging.error(str(message))
+            logging.exception("IndexError")
+            logging.error("Message which caused indexError: "+str(message))

@@ -2,15 +2,16 @@
 
 
 import sys 
-try: # ean treksei se terminal os python app.py test
+try:
+    # checks the index of system arguments
     sys.argv[1]
 except IndexError:
-    # ean yparxei index error simainei oti den dothike parametros
+    # if there is an index error there aren't any
+    # system arguments passed to the program
     pass
 else:
-    # trexei ta arxeia poy vriskontai sta tests
+    # runs the code inside tests/__init__.py
     import tests
-    # termatizei tin leitoyrgeia
     sys.exit(0)
     
     

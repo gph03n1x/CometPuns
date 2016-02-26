@@ -54,8 +54,8 @@ class databasePuns:
         # create two empty lists
         id_pool = []
         result_pool = []
-        for player in number_of_players:
-            for choice in self.options_per_player:
+        for player in range(number_of_players):
+            for choice in range(self.options_per_player):
                 # for each player's choice we generate a random number
                 # between 1 and the number of rows and if the number isn't
                 # already used, we fetch the row with id = generated number

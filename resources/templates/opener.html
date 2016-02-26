@@ -1,8 +1,8 @@
-<div class="ui green segment" id="{% module linkify(message['opener_id']) %}">
+<div class="ui green segment" id="{% module linkify(message['data_id']) %}">
     <div class="ui top attached red progress" id="countdown">
         <div class="bar"></div>
     </div>
     <div class="header">
-        {% module linkify(message['opener_body']) %}
+        {% module linkify(message['data_body']) %}
     </div>
 </div>

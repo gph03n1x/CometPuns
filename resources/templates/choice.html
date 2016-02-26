@@ -1,9 +1,9 @@
 <div class="ui violet message">
     <div class="header">
         <button class="circular ui icon button" 
-                onclick="sendChat('/choice {% module linkify(message["opener_id"]) %}')">
+                onclick="sendChat('/choice {% module linkify(message["data_id"]) %}')">
             <i class="checkmark icon"></i>
         </button>
-            Option : {% module linkify(message['opener_body']) %}
+            Option : {% module linkify(message['data_body']) %}
     </div>
 </div>
