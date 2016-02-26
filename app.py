@@ -38,7 +38,8 @@ from handlers.engine_socket_handler import EngineSocketHandler
 
 # to engine security einai misleading 
 # kai tha eprepe na einai database stuff mono
-from engine.database import databaseInteractions, databasePuns
+from engine.storage.users import databaseInteractions
+from engine.storage.puns import databasePuns
 # to engine pou tha trexei sto background
 from engine.engine import Engine
 
@@ -54,7 +55,7 @@ DBP = databasePuns(config.get('GENERAL', 'PUNS_FILE'))
 DBI = databaseInteractions(config.get('GENERAL', 'DATABASE_FILE'))
 
 # dimiourgeia sql tables an den iparxoun idi
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password, uuid)")
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password, uuid, role, avatar, bio)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id, score INTEGER, ready, choices, choice)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS game_room (id INTEGER PRIMARY KEY, users INTEGER, open, details)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS chat_room (room_id, users)")
