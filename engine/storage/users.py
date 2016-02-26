@@ -11,8 +11,8 @@ import random
 config = ConfigParser.RawConfigParser() 
 config.read('cometpuns.cfg') 
 
+
 class databaseInteractions:
-    
     def __init__(self, dbfile):
         # creates a class attribute with a connection
         # to the database file
@@ -21,6 +21,7 @@ class databaseInteractions:
         self.cursor = self.connection.cursor()
         # sets the max users allowed by the system in a channel
         self.max_users_per_room = config.get('GENERAL', 'MAX_USERS_PER_ROOM')
+
 
     def get_user_room(self, player_name):
         # searches the user_room for a room_id
@@ -117,9 +118,11 @@ class databaseInteractions:
     def invite_player_room(self, player_name, target_player):
         pass
         
+
     def user_is_ready(self, player_name):
         self.execute_raw("UPDATE user_room SET ready=1 WHERE username=?",(player_name, ))
     
+
     def everyone_is_ready(self, room_id):
         users = self.list_room_users(room_id)
         self.cursor.execute("SELECT * FROM game_room WHERE id=?",(room_id,))
@@ -174,6 +177,3 @@ class databaseInteractions:
         self.cursor.execute(*query)
         self.connection.commit()
         return self.cursor.lastrowid
-
-
-
