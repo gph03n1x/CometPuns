@@ -29,12 +29,12 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
         return {}
 
 
-    def construct_chat(self, user="System", message="Sorry that command doesn't exist"):
+    def construct_chat(self, user="System", body="Sorry that command doesn't exist"):
         # returns a message dictionary
         chat = {
             "id": str(uuid.uuid4()),
             "user": user,
-            "body": message,
+            "body": body,
             "time": str(datetime.datetime.now().replace(microsecond=0))
         }
         chat["html"] = tornado.escape.to_basestring(
@@ -56,19 +56,18 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
             logging.debug(chat["body"])
             chat["html"] = tornado.escape.to_basestring(
                 self.render_string("message.html", message=chat))
-            for i in users:
+            for user in users:
                 try:
-                    EngineSocketHandler.users[i[0]].write_message(chat)
+                    self.users[user[0]].write_message(chat)
                 except KeyError:
                     pass
 
-     
     def send_updates(self, room_id, chat):
         users = self.DBI.list_room_users(room_id)
         if users:
             for user in users:
                 try:
-                    EngineSocketHandler.users[users[0]].write_message(chat)
+                    self.users[user[0]].write_message(chat)
                 except KeyError:
                     pass
 
@@ -83,7 +82,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
         
         # Inform everyone he left
         if room_id:
-            chat = self.construct_chat(message="A user left this room")
+            chat = self.construct_chat(body="A user left this room")
             self.inform_room_users(room_id)
         
 
@@ -130,10 +129,13 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                                 self.render_string("opener.html", message=chat))
                             
                             self.send_updates(room_id, chat)
-                            
+                        
                 if room_id:
                     self.inform_room_users(room_id)
+                    current_room = self.DBI.get_user_room(EngineSocketHandler.waiters[self])
                     chat["body"] = "/channel -1"
+                    if current_room:
+                        chat["body"] = "/channel " + str(current_room)
                     
                 chat["html"] = tornado.escape.to_basestring(
                     self.render_string("message.html", message=chat))
@@ -142,7 +144,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 
             else:
                 room_id = self.DBI.get_user_room(EngineSocketHandler.waiters[self])
-                EngineSocketHandler.send_updates(
+                self.send_updates(
                     room_id,
                     self.construct_chat(
                         user=EngineSocketHandler.waiters[self],
