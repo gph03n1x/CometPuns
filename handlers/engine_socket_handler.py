@@ -52,7 +52,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
         users = self.DBI.list_room_users(room_id)
         chat = self.construct_chat()
         if users:
-            chat["body"] = "/users " + " ".join((str(i[0])+":"+str(i[2])) for i in users)
+            chat["body"] = "/users " + " ".join((str(i[0])+":"+str(i[2])+":"+str(i[3])) for i in users)
             logging.debug(chat["body"])
             chat["html"] = tornado.escape.to_basestring(
                 self.render_string("message.html", message=chat))
@@ -117,8 +117,6 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                     room_id = self.DBI.get_user_room(EngineSocketHandler.waiters[self])
                     if room_id:
                         self.DBI.user_is_ready(EngineSocketHandler.waiters[self])
-                        chat["body"] = "/isready " + EngineSocketHandler.waiters[self]
-                        self.send_updates(room_id, chat)
                         
                         if self.DBI.everyone_is_ready(room_id):
                             opener = self.DBP.get_random_opener()
@@ -132,9 +130,12 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
 
                             r_users = self.DBI.list_room_users(room_id)
                             responses = self.DBP.generate_random_responses(len(r_users))
+                            logging.debug("Number of responses : "+str(len(responses)))
                             for user in r_users:
+                                user_choices = "#"
                                 for option in range(self.DBP.options_per_player):
                                     data = responses.pop()
+                                    user_choices += str(data[0])+"#"
                                     chat["body"] = "/choice"
                                     chat["data_id"] = str(data[0])
                                     chat["data_body"] = str(data[1])

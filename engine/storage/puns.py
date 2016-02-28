@@ -51,19 +51,15 @@ class databasePuns:
     
     
     def generate_random_responses(self, number_of_players):
-        # create two empty lists
-        id_pool = []
+        # Create a population of ids from 0<=id<=self.responses
+        # and fetch a sample of number_of_players*self.options_per_player
+        id_pool = random.sample(xrange(self.responses), number_of_players*self.options_per_player)
         result_pool = []
-        for player in range(number_of_players):
-            for choice in range(self.options_per_player):
-                # for each player's choice we generate a random number
-                # between 1 and the number of rows and if the number isn't
-                # already used, we fetch the row with id = generated number
-                random_id = random.randint(1, self.responses)
-                if random_id not in id_pool:
-                    id_pool.append(random_id)
-                    self.cursor.execute("SELECT * FROM responses WHERE id=?",(random_id,))
-                    result_pool.append(self.cursor.fetchone())
+        for random_id in id_pool:
+            # for each id we fetch their response from the
+            # database and we added in the result list
+            self.cursor.execute("SELECT * FROM responses WHERE id=?",(random_id,))
+            result_pool.append(self.cursor.fetchone())
         return result_pool
     
     

@@ -9,6 +9,16 @@ jQuery.fn.formToDict = function() {
     return json;
 };
 
+function createUserRow(data) {
+    var ready_c = data[2] == "1" ? "positive" : "error"; 
+    return(
+        "<tr id='td"+data[0]+"' class='"+ready_c+"'> \
+        <td id='u"+data[0]+"'>"+data[0]+"</td> \
+        <td id='s"+data[0]+"'>"+data[1]+"</td> \
+        </tr>"
+    );
+}
+
 function startTimer(duration) {
     var percentage = 0;
     var step = 100/duration;
@@ -58,10 +68,8 @@ var updater = {
             }
             if (command[0] == "/opener") {
                 $("#opener").empty();
+                $("#options").empty();
                 $("#opener").append(message.data_html);
-            }
-            if (command[0] == "/isready") {
-                $("#td"+command[1]).removeClass( "error" ).addClass( "positive" );
             }
             if (command[0] == "/channel") {
                 $("#roomId").text( "Room Id : #"+command[1]);
@@ -70,7 +78,7 @@ var updater = {
                 $('#users > tr').remove();
                 for (var i = 1; i < arrayLength; i++) {
                     var data = command[i].split(":")
-                    $('#users').append("<tr id='td"+data[0]+"' class='error'><td id='u"+data[0]+"'>"+data[0]+"</td><td id='s"+data[0]+"'>"+data[1]+"</td></tr>");
+                    $('#users').append(createUserRow(data));
                 }
             }
         }

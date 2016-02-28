@@ -40,9 +40,12 @@ class databaseInteractions:
     def user_left_room(self, player_name):
         # we get user's current room
         user_room = self.get_user_room(player_name)
-        # if there isnt any we return -1
+        # if there isn't any we return -1
         if not user_room:
             return -1
+        
+        # we set him as not ready 
+        self.execute_raw("UPDATE user_room SET ready=0 WHERE username=?",(player_name, ))
         # if the room's id isn't -1
         if int(user_room) != -1:
             # we subtract 1 from the game_room users

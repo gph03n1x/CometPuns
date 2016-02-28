@@ -25,7 +25,7 @@ import tornado.websocket
 import ConfigParser
 
 logging.basicConfig(filename='error.log', level=logging.DEBUG)
-
+logging.debug("==========Starting new instance==========")
 import handlers.localization as localization # afora cookie messages
 
 # kanei import handlers oi opoioi xeirizontai ta urls
@@ -59,7 +59,6 @@ DBI = databaseInteractions(config.get('GENERAL', 'DATABASE_FILE'))
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password, uuid, role, avatar, bio)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id, score INTEGER, ready, choices, choice)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS game_room (id INTEGER PRIMARY KEY, users INTEGER, open, details)")
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS chat_room (room_id, users)")
 
 
 print "[+] Conection successfull with database: " + config.get('GENERAL', 'DATABASE_FILE')
