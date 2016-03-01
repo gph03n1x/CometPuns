@@ -1,0 +1,9 @@
+<div class="ui orange message">
+    <div class="header">
+        <button class="circular ui icon button" 
+                onclick="sendChat('/votefor {% module linkify(message["data_id"]) %}')">
+            <i class="checkmark icon"></i>
+        </button>
+            Option : {% module linkify(message['data_body']) %}
+    </div>
+</div>

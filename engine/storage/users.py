@@ -35,7 +35,43 @@ class databaseInteractions:
         # if he did we would return id = -1 since
         # since he isn't inside a channel
         return None
-
+    
+    def get_users_by_diff_choice(self, room_id, choice_id):
+        self.cursor.execute("SELECT * FROM user_room WHERE room_id=? AND choice!=?", (room_id, choice_id))
+        users = self.cursor.fetchall()
+        if users:
+            # if there are users then we return them
+            return users
+        # else we return None hence the channel doesn't exist
+        return None
+    
+    
+    def user_possible_choices(self, player_name, choices):
+        self.execute_raw("UPDATE user_room SET choices=?, choice=0 WHERE username=?",(choices, player_name))
+        
+        
+    def user_choice(self, player_name, choice):
+        self.execute_raw("UPDATE user_room SET choice=? WHERE username=?",(choice, player_name))
+        
+    
+    def everyone_chose(self, room_id):
+        users = self.list_room_users(room_id)
+        self.cursor.execute("SELECT * FROM game_room WHERE id=?",(room_id,))
+        user_count = self.cursor.fetchone()
+        if not user_count or not users:
+            return False
+        
+        choice_count = 0
+        
+        for user in users:
+            logging.debug("Engine:Storage:Users: "+user[5])
+            if user[5] != "0":
+                choice_count = choice_count + 1
+                
+        if choice_count == int(user_count[1]):
+            return True
+        return False
+        
 
     def user_left_room(self, player_name):
         # we get user's current room
@@ -74,7 +110,7 @@ class databaseInteractions:
             # and we associate the user with his new room
             room_id = room[0]
             self.execute_raw("UPDATE game_room SET users=? WHERE id=?", (int(room[1])+1, room[0]))
-            self.execute_raw("UPDATE user_room SET room_id=? AND ready=0 WHERE username=?",(room[0], player_name))
+            self.execute_raw("UPDATE user_room SET room_id=?, ready=0 WHERE username=?",(room[0], player_name))
         else:
             # else we create a new one and we join it ourselves
             room_id = self.create_room_and_join(player_name)
@@ -167,7 +203,7 @@ class databaseInteractions:
         if str(self.cursor.fetchone()) == "None":
             # If there aren't any then we create a new user row along with a user_room association
             self.execute_raw("INSERT INTO users (username, email, password) VALUES (?,?,?)", (username, email, password))
-            self.execute_raw("INSERT INTO user_room (username, room_id, score,ready) VALUES (?,-1,0,0)", (username,))
+            self.execute_raw("INSERT INTO user_room (username, room_id, score, ready, choices, choice, vote) VALUES (?,-1,0,0,0,0,0)", (username,))
             return True
         # return false since the user already exists
         return False

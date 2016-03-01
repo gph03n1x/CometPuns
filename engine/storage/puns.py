@@ -35,6 +35,12 @@ class databasePuns:
         return rows[0]
     
     
+    def get_response_by_id(self, response_id):
+        self.cursor.execute("SELECT * FROM responses WHERE id=?",(response_id,))
+        return self.cursor.fetchone()
+    
+    
+    
     def count_responses(self):
         # counts the number of responses there are in the database
         self.cursor.execute("SELECT Count(*) FROM openers")

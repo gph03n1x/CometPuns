@@ -26,6 +26,7 @@ import ConfigParser
 
 logging.basicConfig(filename='error.log', level=logging.DEBUG)
 logging.debug("==========Starting new instance==========")
+
 import handlers.localization as localization # afora cookie messages
 
 # kanei import handlers oi opoioi xeirizontai ta urls
@@ -56,8 +57,8 @@ DBP = databasePuns(config.get('GENERAL', 'PUNS_FILE'))
 DBI = databaseInteractions(config.get('GENERAL', 'DATABASE_FILE'))
 
 # dimiourgeia sql tables an den iparxoun idi
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password, uuid, role, avatar, bio)")
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id, score INTEGER, ready, choices, choice)")
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password, uuid, role, avatar, bio, score INTEGER)")
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id, score INTEGER, ready, choices, choice, vote)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS game_room (id INTEGER PRIMARY KEY, users INTEGER, open, details)")
 
 

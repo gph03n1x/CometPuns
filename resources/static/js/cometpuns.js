@@ -43,6 +43,8 @@ function startCountdown(seconds){
 }
 
 function refreshRooms(command) {
+    $("#opener").empty();
+    $("#options").empty();
     $(".positive").removeClass( "positive" ).addClass( "error" );
     sendChat(command);
 }
@@ -63,6 +65,13 @@ var updater = {
             var command = message.body.split(" ");
             var arrayLength = command.length;
             console.log(command);
+            if (command[0] == "/clear") {
+                $("#options").empty();
+            }
+            if (command[0] == "/vote") {
+                $("#opener").append(message.data_html);
+            }
+            
             if (command[0] == "/choice") {
                 $("#options").append(message.data_html);
             }

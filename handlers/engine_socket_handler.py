@@ -92,14 +92,37 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
             if parsed[0] == "/":
                 # process request
                 logging.debug("Command: " + parsed)
-                
                 chat = self.construct_chat()
-                
                 parsed = parsed.split()
+                
+                if parsed[0] == "/choice":
+                    
+                    room_id = self.DBI.get_user_room(self.get_secure_cookie("user"))
+                    if room_id:
+                        self.DBI.user_choice(
+                            self.get_secure_cookie("user"), parsed[1]
+                        )
+                        
+                        if self.DBI.everyone_chose(room_id):
+                            chat["body"] = "/clear"
+                            self.send_updates(room_id, chat)
+                            users = self.DBI.list_room_users(room_id)
+                            if users:
+                                for user in users:
+                                    user[5] # choice
+                                    chat["body"] = "/vote"
+                                    chat["data_id"] = str(user[5])
+                                    chat["data_body"] = str(self.DBP.get_response_by_id(user[5])[1])
+                                    chat["data_html"] = tornado.escape.to_basestring(
+                                        self.render_string("vote.html", message=chat))
+                                    other_users = self.DBI.get_users_by_diff_choice(room_id, user[5])
+                                    for other_user in other_users:
+                                        self.users[other_user[0]].write_message(chat)
+                                        
+                
                 if parsed[0] == "/leave":
                     room_id = self.DBI.user_left_room(self.get_secure_cookie("user"))
                     
-                
                 if parsed[0] == "/create":
                     room_id = self.DBI.create_room_and_join(EngineSocketHandler.waiters[self])
 
@@ -107,12 +130,11 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                     room_id = self.DBI.join_player_room(
                         EngineSocketHandler.waiters[self], parsed[1]
                         )
-
-                        
+                    
                 if parsed[0] == "/quickjoin":
                     room_id = self.DBI.quick_join_room(EngineSocketHandler.waiters[self])
 
-                        
+                
                 if parsed[0] == "/ready":
                     room_id = self.DBI.get_user_room(EngineSocketHandler.waiters[self])
                     if room_id:
@@ -142,6 +164,10 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                                     chat["data_html"] = tornado.escape.to_basestring(
                                         self.render_string("choice.html", message=chat))
                                     self.users[user[0]].write_message(chat)
+                                    
+                                    self.DBI.user_possible_choices(
+                                        user[0], user_choices
+                                    )
                             
                         
                 if room_id:
@@ -168,4 +194,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 
         except IndexError:
             logging.exception("IndexError")
-            logging.error("Message which caused indexError: "+str(message))
+            logging.error("Handlers:Socket:Engine Message which caused indexError: "+str(message))
+        
+        except Exception:
+            logging.exception("Handlers:Socket:Engine Unknown error")
