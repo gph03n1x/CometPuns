@@ -45,7 +45,15 @@ class databaseInteractions:
         # else we return None hence the channel doesn't exist
         return None
     
-    
+    def update_score_by_choice_id(self, player_name, choice_id):
+        room_id = self.get_user_room(player_name)
+        if room_id:
+            self.cursor.execute("UPDATE user_room SET score=score+1 WHERE room_id=? AND choice=?", (room_id, choice_id))
+        
+    def reset_ready(self, player_name):
+        self.cursor.execute("UPDATE user_room SET ready=0 WHERE username=?", (player_name,))
+        
+        
     def user_possible_choices(self, player_name, choices):
         self.execute_raw("UPDATE user_room SET choices=?, choice=0 WHERE username=?",(choices, player_name))
         
@@ -64,7 +72,6 @@ class databaseInteractions:
         choice_count = 0
         
         for user in users:
-            logging.debug("Engine:Storage:Users: "+user[5])
             if user[5] != "0":
                 choice_count = choice_count + 1
                 

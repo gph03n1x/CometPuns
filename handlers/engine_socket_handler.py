@@ -46,30 +46,30 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
         # Add the user to the dictionaries
         EngineSocketHandler.waiters[self] = self.get_secure_cookie("user")
         EngineSocketHandler.users[self.get_secure_cookie("user")] = self
-
-
-    def inform_room_users(self, room_id):
-        users = self.DBI.list_room_users(room_id)
-        chat = self.construct_chat()
-        if users:
+        logging.debug("Handlers:Socket:Engine:open: "+ str(EngineSocketHandler.users))
+        
+    @staticmethod
+    def inform_room_users(users, chat):
+        logging.debug("Handlers:Socket:Engine:IRU Users: "+str(users))
+        if users is not None:
             chat["body"] = "/users " + " ".join((str(i[0])+":"+str(i[2])+":"+str(i[3])) for i in users)
             logging.debug(chat["body"])
-            chat["html"] = tornado.escape.to_basestring(
-                self.render_string("message.html", message=chat))
+            #chat["html"] = tornado.escape.to_basestring(
+            #    cls.render_string("message.html", message=chat))
             for user in users:
                 try:
-                    self.users[user[0]].write_message(chat)
+                    EngineSocketHandler.users[user[0]].write_message(chat)
                 except KeyError:
-                    pass
-
-    def send_updates(self, room_id, chat):
-        users = self.DBI.list_room_users(room_id)
+                    logging.exception("Handlers:Socket:Engine: KeyError self.USERS: "+str(EngineSocketHandler.users))
+                    
+    @staticmethod
+    def send_updates(chat, users):
         if users:
             for user in users:
                 try:
-                    self.users[user[0]].write_message(chat)
+                    EngineSocketHandler.users[user[0]].write_message(chat)
                 except KeyError:
-                    pass
+                    logging.exception("Handlers:Socket:Engine: KeyError self.USERS: "+str(EngineSocketHandler.users))
 
 
     def on_close(self):
@@ -82,8 +82,9 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
         
         # Inform everyone he left
         if room_id:
+            users = self.DBI.list_room_users(room_id)
             chat = self.construct_chat(body="A user left this room")
-            self.inform_room_users(room_id)
+            EngineSocketHandler.inform_room_users(users, chat)
         
 
     def on_message(self, message):
@@ -95,6 +96,10 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 chat = self.construct_chat()
                 parsed = parsed.split()
                 
+                if parsed[0] == "/votefor":
+                    self.DBI.update_score_by_choice_id(self.get_secure_cookie("user"), parsed[1])
+                    self.DBI.reset_ready(self.get_secure_cookie("user"))
+                
                 if parsed[0] == "/choice":
                     
                     room_id = self.DBI.get_user_room(self.get_secure_cookie("user"))
@@ -105,8 +110,8 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                         
                         if self.DBI.everyone_chose(room_id):
                             chat["body"] = "/clear"
-                            self.send_updates(room_id, chat)
                             users = self.DBI.list_room_users(room_id)
+                            EngineSocketHandler.send_updates(chat, users)
                             if users:
                                 for user in users:
                                     user[5] # choice
@@ -121,7 +126,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                                         
                 
                 if parsed[0] == "/leave":
-                    room_id = self.DBI.user_left_room(self.get_secure_cookie("user"))
+                    room_id = self.DBI.user_left_room(EngineSocketHandler.waiters[self])
                     
                 if parsed[0] == "/create":
                     room_id = self.DBI.create_room_and_join(EngineSocketHandler.waiters[self])
@@ -148,7 +153,8 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                             chat["data_html"] = tornado.escape.to_basestring(
                                 self.render_string("opener.html", message=chat))
                             
-                            self.send_updates(room_id, chat)
+                            users = self.DBI.list_room_users(room_id)
+                            EngineSocketHandler.send_updates(chat, users)
 
                             r_users = self.DBI.list_room_users(room_id)
                             responses = self.DBP.generate_random_responses(len(r_users))
@@ -171,7 +177,8 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                             
                         
                 if room_id:
-                    self.inform_room_users(room_id)
+                    users = self.DBI.list_room_users(room_id)
+                    EngineSocketHandler.inform_room_users(users, chat)
                     current_room = self.DBI.get_user_room(EngineSocketHandler.waiters[self])
                     chat["body"] = "/channel -1"
                     if current_room:
@@ -184,17 +191,17 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 
             else:
                 room_id = self.DBI.get_user_room(EngineSocketHandler.waiters[self])
-                self.send_updates(
-                    room_id,
+                users = self.DBI.list_room_users(room_id)
+                EngineSocketHandler.send_updates(
                     self.construct_chat(
                         user=EngineSocketHandler.waiters[self],
                         body=parsed
-                    )
+                    ),
+                    users
                 )
                 
         except IndexError:
-            logging.exception("IndexError")
-            logging.error("Handlers:Socket:Engine Message which caused indexError: "+str(message))
+            logging.exception("Handlers:Socket:Engine: Message which caused indexError: "+str(message))
         
         except Exception:
-            logging.exception("Handlers:Socket:Engine Unknown error")
+            logging.exception("Handlers:Socket:Engine: Unknown error")
