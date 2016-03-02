@@ -45,13 +45,23 @@ class databaseInteractions:
         # else we return None hence the channel doesn't exist
         return None
     
+    
+    def is_ready(self, player_name):
+        self.cursor.execute("SELECT * FROM user_room WHERE username=?",(player_name,))
+        result = self.cursor.fetchone()
+        if result is not None:
+            if int(result[3]) == 1:
+                return True
+        return False
+    
+    
+    
     def update_score_by_choice_id(self, player_name, choice_id):
         room_id = self.get_user_room(player_name)
-        if room_id:
-            self.cursor.execute("UPDATE user_room SET score=score+1 WHERE room_id=? AND choice=?", (room_id, choice_id))
         
-    def reset_ready(self, player_name):
-        self.cursor.execute("UPDATE user_room SET ready=0 WHERE username=?", (player_name,))
+        if room_id is not None and self.is_ready(player_name):
+            self.cursor.execute("UPDATE user_room SET score=score+1 WHERE room_id=? AND choice=?", (room_id, choice_id))
+            self.cursor.execute("UPDATE user_room SET ready=0 WHERE username=?", (player_name,))
         
         
     def user_possible_choices(self, player_name, choices):
@@ -72,7 +82,7 @@ class databaseInteractions:
         choice_count = 0
         
         for user in users:
-            if user[5] != "0":
+            if int(user[5]) != 0:
                 choice_count = choice_count + 1
                 
         if choice_count == int(user_count[1]):
@@ -178,9 +188,12 @@ class databaseInteractions:
         
         ready_count = 0
         for user in users:
-            if user[3] == "1":
+            logging.debug("Engine:Storage:Users: "+str(int(user[3])))
+            if int(user[3]) == 1:
                 ready_count = ready_count + 1
                 
+        logging.debug("Engine:Storage:Users: ready_count "+str(ready_count))
+        logging.debug("Engine:Storage:Users: user_count[1] "+str(user_count[1]))
         if ready_count == int(user_count[1]):
             return True
         return False

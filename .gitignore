@@ -18,6 +18,7 @@ SQLiteBrowser/*
 # DB files
 db.sqlite3
 *.db
+*.db-*
 
 # Sphinx Documentation
 source/engine*.txt

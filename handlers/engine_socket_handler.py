@@ -2,7 +2,6 @@
 import tornado.websocket
 import logging
 import uuid
-from engine.bidict import biDict
 import datetime
 
 
@@ -60,7 +59,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 try:
                     EngineSocketHandler.users[user[0]].write_message(chat)
                 except KeyError:
-                    logging.exception("Handlers:Socket:Engine: KeyError self.USERS: "+str(EngineSocketHandler.users))
+                    logging.exception("Handlers:Socket:Engine: KeyError USERS: "+str(EngineSocketHandler.users))
                     
     @staticmethod
     def send_updates(chat, users):
@@ -69,7 +68,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 try:
                     EngineSocketHandler.users[user[0]].write_message(chat)
                 except KeyError:
-                    logging.exception("Handlers:Socket:Engine: KeyError self.USERS: "+str(EngineSocketHandler.users))
+                    logging.exception("Handlers:Socket:Engine: KeyError USERS: "+str(EngineSocketHandler.users))
 
 
     def on_close(self):
@@ -95,14 +94,13 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 logging.debug("Command: " + parsed)
                 chat = self.construct_chat()
                 parsed = parsed.split()
+                room_id = self.DBI.get_user_room(self.get_secure_cookie("user"))
                 
                 if parsed[0] == "/votefor":
                     self.DBI.update_score_by_choice_id(self.get_secure_cookie("user"), parsed[1])
-                    self.DBI.reset_ready(self.get_secure_cookie("user"))
-                
-                if parsed[0] == "/choice":
                     
-                    room_id = self.DBI.get_user_room(self.get_secure_cookie("user"))
+                    
+                if parsed[0] == "/choice":
                     if room_id:
                         self.DBI.user_choice(
                             self.get_secure_cookie("user"), parsed[1]
@@ -122,7 +120,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                                         self.render_string("vote.html", message=chat))
                                     other_users = self.DBI.get_users_by_diff_choice(room_id, user[5])
                                     for other_user in other_users:
-                                        self.users[other_user[0]].write_message(chat)
+                                        EngineSocketHandler.users[other_user[0]].write_message(chat)
                                         
                 
                 if parsed[0] == "/leave":
@@ -141,11 +139,12 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
 
                 
                 if parsed[0] == "/ready":
-                    room_id = self.DBI.get_user_room(EngineSocketHandler.waiters[self])
                     if room_id:
                         self.DBI.user_is_ready(EngineSocketHandler.waiters[self])
-                        
+                        logging.debug("Handlers:Socket:Engine: Everyone is ready status" + str(
+                            self.DBI.everyone_is_ready(room_id)))
                         if self.DBI.everyone_is_ready(room_id):
+                            logging.debug("Handlers:Socket:Engine: Everyone is ready")
                             opener = self.DBP.get_random_opener()
                             chat["body"] = "/opener"
                             chat["data_id"] = str(opener[0])
@@ -155,11 +154,10 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                             
                             users = self.DBI.list_room_users(room_id)
                             EngineSocketHandler.send_updates(chat, users)
-
-                            r_users = self.DBI.list_room_users(room_id)
-                            responses = self.DBP.generate_random_responses(len(r_users))
+                            logging.debug("Handlers:Socket:Engine: Everyone is ready")
+                            responses = self.DBP.generate_random_responses(len(users))
                             logging.debug("Number of responses : "+str(len(responses)))
-                            for user in r_users:
+                            for user in users:
                                 user_choices = "#"
                                 for option in range(self.DBP.options_per_player):
                                     data = responses.pop()
@@ -169,7 +167,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                                     chat["data_body"] = str(data[1])
                                     chat["data_html"] = tornado.escape.to_basestring(
                                         self.render_string("choice.html", message=chat))
-                                    self.users[user[0]].write_message(chat)
+                                    EngineSocketHandler.users[user[0]].write_message(chat)
                                     
                                     self.DBI.user_possible_choices(
                                         user[0], user_choices
