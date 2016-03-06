@@ -122,13 +122,15 @@ class databaseInteractions:
         self.cursor.execute("SELECT * FROM game_room WHERE (users<=? and open='TRUE') ORDER BY users DESC",
                             (self.max_users_per_room,))
         room = self.cursor.fetchone()
-        if room:
+        if room is not None:
             # if there is such a room we increment its users
             # and we associate the user with his new room
-            room_id = room[0]
+            logging.debug("Engine:Storage:Users: quickjoining")
             self.execute_raw("UPDATE game_room SET users=? WHERE id=?", (int(room[1])+1, room[0]))
             self.execute_raw("UPDATE user_room SET room_id=?, ready=0 WHERE username=?",(room[0], player_name))
+            room_id = room[0]
         else:
+            logging.debug("Engine:Storage:Users: creating")
             # else we create a new one and we join it ourselves
             room_id = self.create_room_and_join(player_name)
         return room_id
@@ -142,7 +144,7 @@ class databaseInteractions:
             "INSERT INTO game_room (users, open, details) VALUES (1, 'TRUE', ?)", (str({}), )
                                 )
         # and we are associating him with it
-        self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(str(room_id), player_name))
+        self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(room_id, player_name))
         return room_id
     
     
