@@ -53,12 +53,12 @@ config.read('cometpuns.cfg')
 
 print "[*] Connecting with the database ..."
 # anoigma arxeiwn vasis dedomenon
-DBP = databasePuns(config.get('GENERAL', 'PUNS_FILE'))
+DBP = databasePuns(config.get('GENERAL', 'PUNS_FILE'), config.get('GENERAL', 'OPTIONS_PER_PLAYER'))
 DBI = databaseInteractions(config.get('GENERAL', 'DATABASE_FILE'))
 
 # dimiourgeia sql tables an den iparxoun idi
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username, email, password, uuid, role, avatar, bio, score INTEGER)")
-DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username, room_id, score INTEGER, ready, choices, choice, vote)")
+DBI.execute_raw("CREATE TABLE IF NOT EXISTS user_room (username INTEGER, room_id, score INTEGER, ready, choices, choice, vote)")
 DBI.execute_raw("CREATE TABLE IF NOT EXISTS game_room (id INTEGER PRIMARY KEY, users INTEGER, open, details)")
 
 

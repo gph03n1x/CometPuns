@@ -14,12 +14,15 @@ class ProfileHandler(BaseHandler):
             user = self.get_secure_cookie("user")
         self.render("profile.html")
 
-    def test_avatar(self, url):
+    def is_image_valid(self, url):
         response = urllib2.urlopen(HeadRequest(url))
         maintype = response.headers['Content-Type'].split(';')[0].lower()
 
         if maintype not in ('Image/png', 'Image/pns', 'Image/gif', 'Image/jpg', 'Image/jpeg', 'Image/jpe'):
             logging.debug('invalid type of image')
+            return False
+        
+        return True
 
 class HeadRequest(urllib2.Request):
     def get_method(self):

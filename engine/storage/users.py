@@ -60,6 +60,7 @@ class databaseInteractions:
         room_id = self.get_user_room(player_name)
         
         if room_id is not None and self.is_ready(player_name):
+            
             self.cursor.execute("UPDATE user_room SET score=score+1 WHERE room_id=? AND choice=?", (room_id, choice_id))
             self.cursor.execute("UPDATE user_room SET ready=0 WHERE username=?", (player_name,))
         
@@ -69,6 +70,13 @@ class databaseInteractions:
         
         
     def user_choice(self, player_name, choice):
+        self.cursor.execute("SELECT * FROM user_room WHERE username=?",(player_name,))
+        result = self.cursor.fetchone()
+        f_choice = "#{0}#".format(str(choice))
+        logging.debug(f_choice)
+        logging.debug(result[4])
+        if not f_choice in result[4]:
+            return False
         self.execute_raw("UPDATE user_room SET choice=? WHERE username=?",(choice, player_name))
         
     

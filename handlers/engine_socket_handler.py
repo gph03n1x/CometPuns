@@ -107,8 +107,6 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 if parsed[0] == "/ready":
                     if room_id:
                         self.DBI.user_is_ready(EngineSocketHandler.waiters[self])
-                        logging.debug("Handlers:Socket:Engine: Everyone is ready status: " + str(
-                            self.DBI.everyone_is_ready(room_id)))
                         if self.DBI.everyone_is_ready(room_id):
                             logging.debug("Handlers:Socket:Engine: Everyone is ready")
                             opener = self.DBP.get_random_opener()
@@ -151,7 +149,6 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                             EngineSocketHandler.send_updates(chat, users)
                             if users:
                                 for user in users:
-                                    user[5] # choice
                                     chat["body"] = "/vote"
                                     chat["data_id"] = str(user[5])
                                     chat["data_body"] = str(self.DBP.get_response_by_id(user[5])[1])

@@ -12,7 +12,7 @@ class databasePuns:
         self.cursor = self.connection.cursor()
         self.createTables()
         # number of options per player
-        self.options_per_player = options_per_player
+        self.options_per_player = int(options_per_player)
         # sets the max users allowed by the system in a channel
         self.openers = self.count_openers()
         self.responses = self.count_openers()
@@ -59,6 +59,8 @@ class databasePuns:
     def generate_random_responses(self, number_of_players):
         # Create a population of ids from 0<=id<=self.responses
         # and fetch a sample of number_of_players*self.options_per_player
+        logging.debug(number_of_players)
+        logging.debug(number_of_players*self.options_per_player)
         id_pool = random.sample(xrange(self.responses), number_of_players*self.options_per_player)
         result_pool = []
         for random_id in id_pool:
