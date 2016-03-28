@@ -160,6 +160,8 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                                         
                 if parsed[0] == "/votefor":
                     self.DBI.update_score_by_choice_id(self.get_secure_cookie("user"), parsed[1])
+                    chat["body"] = "/clear"
+                    self.write_message(chat)
                 
                 if parsed[0] == "/leave":
                     self.DBI.user_left_room(EngineSocketHandler.waiters[self])

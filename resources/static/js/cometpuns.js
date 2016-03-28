@@ -69,7 +69,7 @@ var updater = {
                 $("#options").empty();
             }
             if (command[0] == "/vote") {
-                $("#opener").append(message.data_html);
+                $("#options").append(message.data_html);
             }
             
             if (command[0] == "/choice") {
