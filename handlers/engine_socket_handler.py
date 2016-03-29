@@ -157,9 +157,15 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                                     other_users = self.DBI.get_users_by_diff_choice(room_id, user[5])
                                     for other_user in other_users:
                                         EngineSocketHandler.users[other_user[0]].write_message(chat)
+                                chat["data_id"] = "-1"
+                                chat["data_body"] = "Skip"
+                                chat["data_html"] = tornado.escape.to_basestring(
+                                    self.render_string("vote.html", message=chat))
+                                EngineSocketHandler.send_updates(chat, users)
                                         
                 if parsed[0] == "/votefor":
-                    self.DBI.update_score_by_choice_id(self.get_secure_cookie("user"), parsed[1])
+                    if parsed[1] != "-1":
+                        self.DBI.update_score_by_choice_id(self.get_secure_cookie("user"), parsed[1])
                     chat["body"] = "/clear"
                     self.write_message(chat)
                 
