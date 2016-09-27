@@ -11,7 +11,7 @@ class ProfileHandler(BaseHandler):
     @tornado.web.authenticated
     def get(self, user=None):
         if user is None:
-            user = self.get_secure_cookie("user")
+            user = self.get_secure_cookie("user").decode()
         self.render("profile.html")
 
 """

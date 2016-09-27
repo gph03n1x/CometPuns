@@ -46,11 +46,14 @@ class AuthHandler(BaseHandler):
         if len(self.get_arguments('email')) >0 and len(self.get_arguments('password')) > 0:
             # trying to authenticate with the database
             username = self.DBI.authenticate(self.get_arguments('email')[0], self.get_arguments('password')[0])
+            print("L0")
             if username:
+                print("L1")
                 # if username is not None then
                 # the user got authenticated
                 # generate a random uuid
                 r_uuid = str(uuid.uuid4())
+
                 # set the random uuid for the user
                 self.DBI.update_uuid(username[1], r_uuid)
                 # update the cookies
