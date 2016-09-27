@@ -9,6 +9,6 @@ for i in range(100):
     connection.commit()
     cursor.execute("INSERT INTO responses (content) VALUES (?)", (placeholder,))
     connection.commit()
-    
+
 connection.close()
-print "DONE"
+print("DONE")

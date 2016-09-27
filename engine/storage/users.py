@@ -4,12 +4,12 @@ import hashlib
 import datetime
 import ast
 import inspect
-import ConfigParser
+import configparser
 import logging
 import random
 
-config = ConfigParser.RawConfigParser() 
-config.read('cometpuns.cfg') 
+config = configparser.RawConfigParser()
+config.read('cometpuns.cfg')
 
 
 class databaseInteractions:
@@ -35,7 +35,7 @@ class databaseInteractions:
         # if he did we would return id = -1 since
         # since he isn't inside a channel
         return None
-    
+
     def get_users_by_diff_choice(self, room_id, choice_id):
         self.cursor.execute("SELECT * FROM user_room WHERE room_id=? AND choice!=?", (room_id, choice_id))
         users = self.cursor.fetchall()
@@ -44,8 +44,8 @@ class databaseInteractions:
             return users
         # else we return None hence the channel doesn't exist
         return None
-    
-    
+
+
     def is_ready(self, player_name):
         self.cursor.execute("SELECT * FROM user_room WHERE username=?",(player_name,))
         result = self.cursor.fetchone()
@@ -53,22 +53,22 @@ class databaseInteractions:
             if int(result[3]) == 1:
                 return True
         return False
-    
-    
-    
+
+
+
     def update_score_by_choice_id(self, player_name, choice_id):
         room_id = self.get_user_room(player_name)
-        
+
         if room_id is not None and self.is_ready(player_name):
-            
+
             self.cursor.execute("UPDATE user_room SET score=score+1 WHERE room_id=? AND choice=?", (room_id, choice_id))
             self.cursor.execute("UPDATE user_room SET ready=0 WHERE username=?", (player_name,))
-        
-        
+
+
     def user_possible_choices(self, player_name, choices):
         self.execute_raw("UPDATE user_room SET choices=?, choice=0 WHERE username=?",(choices, player_name))
-        
-        
+
+
     def user_choice(self, player_name, choice):
         self.cursor.execute("SELECT * FROM user_room WHERE username=?",(player_name,))
         result = self.cursor.fetchone()
@@ -78,25 +78,25 @@ class databaseInteractions:
         if not f_choice in result[4]:
             return False
         self.execute_raw("UPDATE user_room SET choice=? WHERE username=?",(choice, player_name))
-        
-    
+
+
     def everyone_chose(self, room_id):
         users = self.list_room_users(room_id)
         self.cursor.execute("SELECT * FROM game_room WHERE id=?",(room_id,))
         user_count = self.cursor.fetchone()
         if not user_count or not users:
             return False
-        
+
         choice_count = 0
-        
+
         for user in users:
             if int(user[5]) != 0:
                 choice_count = choice_count + 1
-                
+
         if choice_count == int(user_count[1]):
             return True
         return False
-        
+
 
     def user_left_room(self, player_name):
         # we get user's current room
@@ -104,8 +104,8 @@ class databaseInteractions:
         # if there isn't any we return -1
         if not user_room:
             return -1
-        
-        # we set him as not ready 
+
+        # we set him as not ready
         self.execute_raw("UPDATE user_room SET ready=0 WHERE username=?",(player_name, ))
         # if the room's id isn't -1
         if int(user_room) != -1:
@@ -118,7 +118,7 @@ class databaseInteractions:
             if int(room[1])-1 == 0:
                 # if the game_room has 0 users we remove it from the database
                 self.execute_raw("DELETE FROM game_room WHERE users=0")
-            # we return the room's id 
+            # we return the room's id
             return room[0]
 
 
@@ -154,8 +154,8 @@ class databaseInteractions:
         # and we are associating him with it
         self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(room_id, player_name))
         return room_id
-    
-    
+
+
     def list_room_users(self, room_id):
         # Executes an sql query which fetches
         # all users in a room
@@ -166,8 +166,8 @@ class databaseInteractions:
             return users
         # else we return None hence the channel doesn't exist
         return None
-    
-    
+
+
     def join_player_room(self, player_name, target_player):
         # Fetches the id of the room from the user
         # we want to join
@@ -179,15 +179,15 @@ class databaseInteractions:
             self.execute_raw("UPDATE game_room SET users=users+1 WHERE id=?", (room_id, ))
             self.execute_raw("UPDATE user_room SET room_id=? WHERE username=?",(room_id, player_name))
             return room_id
-        
-        
+
+
     def invite_player_room(self, player_name, target_player):
         pass
-        
+
 
     def user_is_ready(self, player_name):
         self.execute_raw("UPDATE user_room SET ready=1 WHERE username=?",(player_name, ))
-    
+
 
     def everyone_is_ready(self, room_id):
         users = self.list_room_users(room_id)
@@ -195,33 +195,33 @@ class databaseInteractions:
         user_count = self.cursor.fetchone()
         if not user_count or not users:
             return False
-        
+
         ready_count = 0
         for user in users:
             logging.debug("Engine:Storage:Users: "+str(int(user[3])))
             if int(user[3]) == 1:
                 ready_count = ready_count + 1
-                
+
         logging.debug("Engine:Storage:Users: ready_count "+str(ready_count))
         logging.debug("Engine:Storage:Users: user_count[1] "+str(user_count[1]))
         if ready_count == int(user_count[1]):
             return True
         return False
-            
+
 
     def authenticate(self, email, password):
         # Fetches any row in the database where
         # the email and the password match
         self.cursor.execute("SELECT * FROM users WHERE email=? AND password=?", (email,password))
         return self.cursor.fetchone()
-    
-    
+
+
     def get_user_uuid(self, username):
         # Fetches the current uuid
         self.cursor.execute("SELECT uuid FROM users WHERE username=?", (username,))
         return self.cursor.fetchone()
-    
-    
+
+
     def update_uuid(self, username, _uuid):
         # Update the uuid field of the user
         self.execute_raw("UPDATE users SET uuid=? WHERE username=?",(str(_uuid),username))

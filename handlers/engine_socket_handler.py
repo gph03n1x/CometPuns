@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 import tornado.websocket
 import logging
 import uuid
@@ -104,6 +105,7 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 room_id = self.DBI.get_user_room(self.get_secure_cookie("user"))
                 
                 
+                
                 if parsed[0] == "/ready":
                     if room_id:
                         self.DBI.user_is_ready(EngineSocketHandler.waiters[self])
@@ -204,6 +206,15 @@ class EngineSocketHandler(tornado.websocket.WebSocketHandler):
                 self.write_message(chat)
                 
             else:
+                if parsed[0] == "/login" and len(parsed) > 2:
+
+                    username = self.DBI.authenticate(
+                        parsed[1], parsed[2]
+                    )
+                    if username:
+                        chat["body"] = "Logged in successfully"
+                else:
+                    pass
                 room_id = self.DBI.get_user_room(EngineSocketHandler.waiters[self])
                 users = self.DBI.list_room_users(room_id)
                 EngineSocketHandler.send_updates(
