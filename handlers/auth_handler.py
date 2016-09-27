@@ -11,7 +11,7 @@ class AuthHandler(BaseHandler):
 
 
     def get(self):
-        # if the user is already logged in then 
+        # if the user is already logged in then
         if self.get_current_user():
             # he gets redirected to the lobby
             self.redirect("/")
@@ -24,7 +24,7 @@ class AuthHandler(BaseHandler):
         # user wants to register to the website
         if len(self.get_arguments('emailR')) > 0 and len(self.get_arguments('passwordR')) > 0 \
         and len(self.get_arguments('usernameR')) > 0:
-            # attempting to register 
+            # attempting to register
             register_status = self.DBI.register(self.get_arguments('usernameR')[0],
                                            self.get_arguments('emailR')[0],
                                            self.get_arguments('passwordR')[0])
@@ -39,9 +39,10 @@ class AuthHandler(BaseHandler):
                 self.set_cookie('info', 'SMSG4')
             # go back to /auth so that the user can log in
             self.redirect("/auth")
-            
+
         # if the email and the password inputs are filled
         # we are going to attempt an authentication
+        # TODO: code seems broken here.
         if len(self.get_arguments('email')) >0 and len(self.get_arguments('password')) > 0:
             # trying to authenticate with the database
             username = self.DBI.authenticate(self.get_arguments('email')[0], self.get_arguments('password')[0])
@@ -52,7 +53,7 @@ class AuthHandler(BaseHandler):
                 r_uuid = str(uuid.uuid4())
                 # set the random uuid for the user
                 self.DBI.update_uuid(username[1], r_uuid)
-                # update the cookies 
+                # update the cookies
                 self.set_secure_cookie("user", username[1])
                 self.set_secure_cookie("uuid", r_uuid)
                 self.set_cookie('info', 'SMSG1')
@@ -63,7 +64,7 @@ class AuthHandler(BaseHandler):
                 # were wrong and redirect back to /auth
                 self.set_cookie('info', 'SMSG2')
                 self.redirect('/auth')
-                
+
         else:
             # if the user didnt logged in or registered
             # then he is trying to logout , so we clear
